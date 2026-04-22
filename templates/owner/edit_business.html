@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="referrer" content="origin">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Business</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        /* --- Base Styles Adapted from Home/Add Business --- */
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-gray: #f8f9fa;
+            --text-dark: #1f2937;
+            --text-gray: #6b7280;
+            --border-light: #e5e7eb;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 1000px;
+            /* Limit width for readability without card look */
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 0;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background-color: #f3f4f6;
+            border-color: #d1d5db;
+        }
+
+        .back-button svg {
+            margin-right: 6px;
+            width: 18px;
+            height: 18px;
+        }
+
+        /* --- Form Styles --- */
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 15px;
+            font-weight: 600;
+            color: #34495e;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        input[type="url"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+
+        input[type="text"]:focus,
+        input[type="url"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button[type="submit"] {
+            margin-top: 30px;
+            padding: 12px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button[type="submit"]:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            /* For links styled as buttons */
+        }
+
+        .btn-secondary:hover {
+            background-color: #27ae60;
+        }
+
+        .message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .help-text {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .address-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .address-grid {
+                grid-template-columns: 1fr;
+            }
+
+            body {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column-reverse;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .header h2 {
+                margin-top: 0;
+            }
+        }
+
+        /* Map specific styles */
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 2px solid #ddd;
+            z-index: 1;
+        }
+
+        /* Hours Table */
+        .hours-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            /* Subtle shadow for table only */
+        }
+
+        .hours-table th,
+        .hours-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .hours-table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .hours-table input[type="time"] {
+            padding: 5px;
+            margin-top: 0;
+        }
+
+        /* Social Media */
+        .social-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .remove-social-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0 12px;
+            height: 45px;
+            cursor: pointer;
+            width: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: black;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #locationSearch {
+            flex-grow: 1;
+            margin-top: 0;
+        }
+
+        #searchBtn {
+            margin-top: 0;
+            padding: 10px 20px;
+            width: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-wrapper">
+        <div class="header">
+            <h2>Update Business: {{ business.name }}</h2>
+            <a href="{% url 'owner_manage_business' %}" class="back-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back
+            </a>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="message">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" id="businessForm">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="message error-message"
+                style="color: #dc3545; background-color: #f8d7da; border-color: #f5c6cb;">
+                <p style="margin: 0; font-weight: bold;">Please fix the following errors:</p>
+                <ul style="margin: 5px 0; padding-left: 20px;">
+                    {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                    <li>{{ field|title }}: {{ error }}</li>
+                    {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- User Details (Read-only) -->
+            <div class="form-group">
+                <label>Your Details</label>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <label for="name" style="font-size: 0.9em; margin-top: 5px; color:#666;">Name</label>
+                        <input type="text" name="name" value="{{ form.name.value|default:'' }}" readonly
+                            style="background-color: #e9ecef;">
+                    </div>
+                    <div style="flex: 1; min-width: 250px;">
+                        <label for="email" style="font-size: 0.9em; margin-top: 5px; color:#666;">Email</label>
+                        <input type="text" value="{{ user_email }}" readonly style="background-color: #e9ecef;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="shop">Shop Name</label>
+                {{ form.shop }}
+                {% if form.shop.errors %}
+                <div class="error-message">{{ form.shop.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="mobile_number">Mobile Number</label>
+                {{ form.mobile_number }}
+                {% if form.mobile_number.errors %}
+                <div class="error-message">{{ form.mobile_number.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="business_type">Type of Business</label>
+                {{ form.business_type }}
+                {% if form.business_type.errors %}
+                <div class="error-message">{{ form.business_type.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="proof_of_business">Proof of business owned</label>
+                {% if business.proof_of_business %}
+                <div
+                    style="margin-bottom: 10px; padding: 10px; background: #e8f5e9; border: 1px solid #c3e6cb; border-radius: 4px; display: flex; align-items: center; justify-content: space-between;">
+                    <span style="color: #27ae60; font-weight: 500; display: flex; align-items: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="margin-right: 5px;">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Proof Uploaded
+                    </span>
+                    <a href="{{ business.proof_of_business.url }}" target="_blank" class="btn-secondary"
+                        style="margin:0; padding: 5px 12px; text-decoration: none; font-size: 13px; background-color: #27ae60; color: white; border-radius: 4px;">View
+                        Proof</a>
+                </div>
+                <div class="help-text" style="color: #666; font-size: 13px; margin-bottom: 5px;">To replace the existing
+                    proof, upload a new file below (optional):</div>
+                {% else %}
+                <div class="help-text">Upload a PDF or Image as proof of ownership</div>
+                {% endif %}
+                <input type="file" id="proof_of_business" name="proof_of_business" accept=".pdf,image/*">
+                <!-- Preview Container for Proof -->
+                <div id="proofPreviewContainer" style="margin-top: 10px; display: none;">
+                    <p style="margin:0; font-weight:600; font-size:14px; margin-bottom:5px;">Preview New Upload:</p>
+                    <div id="proofPreviewContent"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="business_images">Business Image(s)</label>
+                <input type="file" id="business_images" name="business_images" accept="image/*" multiple>
+                <div class="help-text">Upload additional images (new images will be added to the existing ones)</div>
+                <!-- Preview Container for Business Images -->
+                <div id="imagesPreviewContainer" style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+
+                    {% for image in business.images.all %}
+                    <div class="existing-image-wrapper" style="position: relative; display: inline-block;">
+                        <img src="{{ image.image.url }}"
+                            style="height: 100px; width: 100px; object-fit: cover; border-radius: 4px;">
+                        <button type="submit" name="delete_image" value="{{ image.id }}"
+                            style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; margin: 0; font-size: 12px;"
+                            onclick="return confirm('Delete this image?')">X</button>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Business Location</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button type="button" id="openMapBtn" class="btn-secondary" style="margin-top: 0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="margin-right: 5px; vertical-align: text-bottom;">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        Pick Location on Map
+                    </button>
+                    <span id="locationStatus" style="color: #666; font-size: 14px;">No location selected</span>
+                </div>
+                <!-- Hidden Fields for Lat/Long -->
+                {{ form.latitude }}
+                {{ form.longitude }}
+                <!-- Legacy/Hidden Field -->
+                {{ form.google_map_location }}
+            </div>
+
+            <div class="form-group">
+                <label for="business_address">Business Address</label>
+                {{ form.business_address }}
+                {% if form.business_address.errors %}
+                <div class="error-message">{{ form.business_address.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="address-grid">
+                <div class="form-group">
+                    <label for="id_city">City/Town</label>
+                    {{ form.city }}
+                </div>
+                <div class="form-group">
+                    <label for="id_district">District</label>
+                    {{ form.district }}
+                </div>
+                <div class="form-group">
+                    <label for="id_state">State</label>
+                    {{ form.state }}
+                </div>
+                <div class="form-group">
+                    <label for="id_postal_code">Postal Code</label>
+                    {{ form.postal_code }}
+                </div>
+                <div class="form-group">
+                    <label for="id_country">Country</label>
+                    {{ form.country }}
+                </div>
+                <div class="form-group">
+                    <label for="id_landmark">Landmark</label>
+                    <input type="text" name="landmark" id="id_landmark" placeholder="Near post office, etc."
+                        value="{{ form.landmark.value|default:'' }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Business Description</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <div class="error-message">{{ form.description.errors }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Social Media Links (Dynamic) -->
+            <div class="form-group">
+                <label>Social Media Links</label>
+                <div id="socialMediaContainer">
+                    <!-- Dynamic rows will be added here -->
+                </div>
+                {{ social_links|json_script:"social-links-data" }}
+                <button type="button" id="addSocialBtn" class="btn-secondary"
+                    style="width: auto; font-size: 14px; padding: 8px 15px;">+ Add Social Link</button>
+            </div>
+
+            <!-- Structured Operating Hours -->
+            <div class="form-group">
+                <label>Hours of Operation</label>
+                <div class="hours-actions" style="margin-bottom: 10px;">
+                    <button type="button" class="btn-secondary" onclick="applyMondayToAll()"
+                        style="font-size: 12px; padding: 5px 10px; width: auto; background-color: #3498db;">Apply
+                        Monday's Hours to All Days</button>
+                </div>
+                <div class="hours-container">
+                    <table class="hours-table">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Open Time</th>
+                                <th>Close Time</th>
+                                <th>Closed?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Manual rows for operating hours with value injection -->
+                            <tr class="day-row" data-day="0">
+                                <td>Monday</td>
+                                <td><input type="time" name="hours_open_0"
+                                        value="{{ hours_data.0.open_time|time:'H:i' }}"></td>
+                                <td><input type="time" name="hours_close_0"
+                                        value="{{ hours_data.0.close_time|time:'H:i' }}"></td>
+                                <td><input type="checkbox" name="hours_closed_0" onchange="toggleHours(0)" {{
+                                        hours_data.0.is_closed|yesno:"checked," }}></td>
+                            </tr>
+                            <tr class="day-row" data-day="1">
+                                <td>Tuesday</td>
+                                <td><input type="time" name="hours_open_1"
+                                        value="{{ hours_data.1.open_time|time:'H:i' }}"></td>
+                                <td><input type="time" name="hours_close_1"
+                                        value="{{ hours_data.1.close_time|time:'H:i' }}"></td>
+                                <td><input type="checkbox" name="hours_closed_1" onchange="toggleHours(1)" {{
+                                        hours_data.1.is_closed|yesno:"checked," }}></td>
+                            </tr>
+                            <tr class="day-row" data-day="2">
+                                <td>Wednesday</td>
+                                <td><input type="time" name="hours_open_2"
+                                        value="{{ hours_data.2.open_time|time:'H:i' }}"></td>
+                                <td><input type="time" name="hours_close_2"
+                                        value="{{ hours_data.2.close_time|time:'H:i' }}"></td>
+                                <td><input type="checkbox" name="hours_closed_2" onchange="toggleHours(2)" {{
+                                        hours_data.2.is_closed|yesno:"checked," }}></td>
+                            </tr>
+                            <tr class="day-row" data-day="3">
+                                <td>Thursday</td>
+                                <td><input type="time" name="hours_open_3"
+                                        value="{{ hours_data.3.open_time|time:'H:i' }}"></td>
+                                <td><input type="time" name="hours_close_3"
+                                        value="{{ hours_data.3.close_time|time:'H:i' }}"></td>
+                                <td><input type="checkbox" name="hours_closed_3" onchange="toggleHours(3)" {{
+                                        hours_data.3.is_closed|yesno:"checked," }}></td>
+                            </tr>
+                            <tr class="day-row" data-day="4">
+                                <td>Friday</td>
+                                <td><input type="time" name="hours_open_4"
+                                        value="{{ hours_data.4.open_time|time:'H:i' }}"></td>
+                                <td><input type="time" name="hours_close_4"
+                                        value="{{ hours_data.4.close_time|time:'H:i' }}"></td>
+                                <td><input type="checkbox" name="hours_closed_4" onchange="toggleHours(4)" {{
+                                        hours_data.4.is_closed|yesno:"checked," }}></td>
+                            </tr>
+                            <tr class="day-row" data-day="5">
+                                <td>Saturday</td>
+                                <td><input type="time" name="hours_open_5"
+                                        value="{{ hours_data.5.open_time|time:'H:i' }}"></td>
+                                <td><input type="time" name="hours_close_5"
+                                        value="{{ hours_data.5.close_time|time:'H:i' }}"></td>
+                                <td><input type="checkbox" name="hours_closed_5" onchange="toggleHours(5)" {{
+                                        hours_data.5.is_closed|yesno:"checked," }}></td>
+                            </tr>
+                            <tr class="day-row" data-day="6">
+                                <td>Sunday</td>
+                                <td><input type="time" name="hours_open_6"
+                                        value="{{ hours_data.6.open_time|time:'H:i' }}"></td>
+                                <td><input type="time" name="hours_close_6"
+                                        value="{{ hours_data.6.close_time|time:'H:i' }}"></td>
+                                <td><input type="checkbox" name="hours_closed_6" onchange="toggleHours(6)" {{
+                                        hours_data.6.is_closed|yesno:"checked," }}></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">
+                Save Changes
+                <span class="loader" id="loader"></span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Map Modal -->
+    <div id="mapModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Select Location</h3>
+
+            <div class="search-container">
+                <input type="text" id="locationSearch" placeholder="Search by pincode, city, or area...">
+                <button type="button" id="searchBtn" class="btn-secondary" style="margin-top: 0;">Search</button>
+            </div>
+
+            <button type="button" id="getLocationBtn" class="btn-secondary"
+                style="margin-bottom: 10px; width: auto; margin-top: 0;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="margin-right: 5px; vertical-align: text-bottom;">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Use My Current Location
+            </button>
+
+            <div id="map"></div>
+
+            <div style="margin-top: 15px; text-align: right;">
+                <button type="button" id="confirmLocationBtn" class="btn-secondary"
+                    style="margin-top: 0; background-color: #2ecc71;">Confirm
+                    Location</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Viewer Modal -->
+    <div id="pdfModal" class="modal">
+        <div class="modal-content"
+            style="height: 80vh; width: 90%; max-width: 1000px; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin: 0;">Proof of Business Preview</h3>
+                <span class="close-pdf-modal" style="font-size: 28px; cursor: pointer;">&times;</span>
+            </div>
+            <iframe id="pdfViewerFrame" src=""
+                style="width: 100%; flex-grow: 1; border: none; border-radius: 4px;"></iframe>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('businessForm').addEventListener('submit', function (e) {
+            var submitBtn = document.getElementById('submitBtn');
+            var loader = document.getElementById('loader');
+
+            if (!document.querySelector('.error-message')) {
+                submitBtn.disabled = true;
+                submitBtn.style.paddingRight = '40px';
+                loader.style.display = 'block';
+            }
+        });
+
+        // Toggle Hours Input
+        function toggleHours(dayIndex) {
+            var checkbox = document.querySelector(`input[name="hours_closed_${dayIndex}"]`);
+            var openInput = document.querySelector(`input[name="hours_open_${dayIndex}"]`);
+            var closeInput = document.querySelector(`input[name="hours_close_${dayIndex}"]`);
+
+            if (checkbox.checked) {
+                openInput.disabled = true;
+                closeInput.disabled = true;
+                openInput.value = '';
+                closeInput.value = '';
+                openInput.style.backgroundColor = '#f0f0f0';
+                closeInput.style.backgroundColor = '#f0f0f0';
+            } else {
+                openInput.disabled = false;
+                closeInput.disabled = false;
+                openInput.style.backgroundColor = 'white';
+                closeInput.style.backgroundColor = 'white';
+            }
+        }
+
+        // Apply Monday to All
+        function applyMondayToAll() {
+            var monOpen = document.querySelector('input[name="hours_open_0"]').value;
+            var monClose = document.querySelector('input[name="hours_close_0"]').value;
+            var monClosed = document.querySelector('input[name="hours_closed_0"]').checked;
+
+            for (var i = 1; i <= 6; i++) {
+                document.querySelector(`input[name="hours_open_${i}"]`).value = monOpen;
+                document.querySelector(`input[name="hours_close_${i}"]`).value = monClose;
+                var checkbox = document.querySelector(`input[name="hours_closed_${i}"]`);
+                checkbox.checked = monClosed;
+                toggleHours(i); // Update UI state
+            }
+        }
+
+        // Social Media Logic
+        var socialContainer = document.getElementById('socialMediaContainer');
+        var addSocialBtn = document.getElementById('addSocialBtn');
+        var socialCount = 0;
+
+        if (addSocialBtn) {
+            addSocialBtn.addEventListener('click', function () {
+                addSocialRow();
+            });
+        }
+
+        function addSocialRow(platform = '', url = '') {
+            socialCount++;
+            var div = document.createElement('div');
+            div.className = 'social-row';
+            div.innerHTML = `
+                <select name="social_platform_${socialCount}" style="flex:1;">
+                    <option value="">Select Platform</option>
+                    <option value="Facebook" ${platform === 'Facebook' ? 'selected' : ''}>Facebook</option>
+                    <option value="Instagram" ${platform === 'Instagram' ? 'selected' : ''}>Instagram</option>
+                    <option value="Twitter" ${platform === 'Twitter' ? 'selected' : ''}>Twitter/X</option>
+                    <option value="LinkedIn" ${platform === 'LinkedIn' ? 'selected' : ''}>LinkedIn</option>
+                    <option value="YouTube" ${platform === 'YouTube' ? 'selected' : ''}>YouTube</option>
+                    <option value="Website" ${platform === 'Website' ? 'selected' : ''}>Website</option>
+                </select>
+                <input type="url" name="social_url_${socialCount}" value="${url}" placeholder="https://..." style="flex:2;">
+                <button type="button" class="remove-social-btn" onclick="this.parentElement.remove()">X</button>
+            `;
+            socialContainer.appendChild(div);
+        }
+
+        // Populate existing social links
+        const existingLinks = JSON.parse(document.getElementById('social-links-data').textContent);
+        if (existingLinks && existingLinks.length > 0) {
+            existingLinks.forEach(link => {
+                addSocialRow(link.platform, link.url);
+            });
+        }
+
+        // Map & Modal Logic
+        var map, marker;
+        var modal = document.getElementById("mapModal");
+        var openBtn = document.getElementById("openMapBtn");
+        var closeSpan = document.getElementsByClassName("close-modal")[0];
+        var confirmBtn = document.getElementById("confirmLocationBtn");
+        var searchBtn = document.getElementById("searchBtn");
+        var searchInput = document.getElementById("locationSearch");
+
+        // Open Modal
+        openBtn.onclick = function () {
+            modal.style.display = "block";
+            // Initialize with current values if available
+            var latVal = document.getElementById('id_latitude').value;
+            var lngVal = document.getElementById('id_longitude').value;
+
+            if (!map) {
+                initMap(latVal, lngVal);
+            } else {
+                setTimeout(function () { map.invalidateSize(); }, 200);
+            }
+        }
+
+        // Close Modal
+        closeSpan.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // Modal Outside click logic handled at end
+
+        function initMap(lat, lng) {
+            var initialLat = lat || 20.5937;
+            var initialLng = lng || 78.9629;
+            var zoomLevel = lat ? 16 : 5;
+
+            map = L.map('map').setView([initialLat, initialLng], zoomLevel);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            if (lat && lng) {
+                marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+                marker.on('dragend', function (event) { });
+            }
+
+            map.on('click', onMapClick);
+        }
+
+        function onMapClick(e) {
+            placeMarker(e.latlng);
+        }
+
+        function placeMarker(latlng) {
+            if (marker) {
+                marker.setLatLng(latlng);
+            } else {
+                marker = L.marker(latlng, { draggable: true }).addTo(map);
+                marker.on('dragend', function (event) {
+                    // Optional: Update UI immediately or wait for confirm
+                });
+            }
+            map.flyTo(latlng, 16);
+        }
+
+        // Confirm Location
+        confirmBtn.onclick = function () {
+            if (marker) {
+                var position = marker.getLatLng();
+                updateLocationFields(position.lat, position.lng);
+                modal.style.display = "none";
+                document.getElementById("locationStatus").innerText = "Location Selected";
+                document.getElementById("locationStatus").style.color = "#27ae60";
+            } else {
+                alert("Please select a location on the map first.");
+            }
+        }
+
+        function updateLocationFields(lat, lng) {
+            // Round to 6 decimal places
+            var latFixed = lat.toFixed(6);
+            var lngFixed = lng.toFixed(6);
+
+            document.getElementById('id_latitude').value = latFixed;
+            document.getElementById('id_longitude').value = lngFixed;
+            document.getElementById('id_google_map_location').value = latFixed + "," + lngFixed;
+
+            // Reverse Geocoding
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                .then(response => response.json())
+                .then(data => {
+                    const address = data.address;
+                    if (data.display_name) {
+                        document.getElementById('id_business_address').value = data.display_name;
+                    }
+                    if (address.city || address.town || address.village) document.getElementById('id_city').value = address.city || address.town || address.village || '';
+                    if (address.state_district || address.county) document.getElementById('id_district').value = address.state_district || address.county || '';
+                    if (address.state) document.getElementById('id_state').value = address.state || '';
+                    if (address.postcode) document.getElementById('id_postal_code').value = address.postcode || '';
+                    if (address.country) document.getElementById('id_country').value = address.country || '';
+                })
+                .catch(error => console.error('Error fetching address:', error));
+        }
+
+        // Preview Logic for Proof of Business
+        document.getElementById('proof_of_business').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const container = document.getElementById('proofPreviewContainer');
+            const content = document.getElementById('proofPreviewContent');
+
+            content.innerHTML = ''; // Clear previous preview
+
+            if (file) {
+                container.style.display = 'block';
+                const fileType = file.type;
+                const fileUrl = URL.createObjectURL(file);
+
+                if (fileType.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = fileUrl;
+                    img.style.maxWidth = '200px';
+                    img.style.maxHeight = '200px';
+                    img.style.borderRadius = '8px';
+                    img.style.border = '1px solid #ddd';
+                    content.appendChild(img);
+                } else if (fileType === 'application/pdf') {
+                    content.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; width: fit-content;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            <span style="font-size: 14px; color: #333; margin-right: 10px;">${file.name}</span>
+                            <button type="button" id="viewPdfBtn" class="btn-secondary" style="margin: 0; padding: 5px 10px; font-size: 12px; height: auto;">View PDF</button>
+                        </div>
+                    `;
+
+                    document.getElementById('viewPdfBtn').addEventListener('click', function () {
+                        const pdfModal = document.getElementById('pdfModal');
+                        const pdfFrame = document.getElementById('pdfViewerFrame');
+                        pdfFrame.src = fileUrl;
+                        pdfModal.style.display = "block";
+                    });
+                } else {
+                    content.innerHTML = `<span style="color: #666; font-size: 14px;">${file.name}</span>`;
+                }
+            } else {
+                container.style.display = 'none';
+            }
+        });
+
+        // PDF Modal Close Logic
+        document.querySelector('.close-pdf-modal').onclick = function () {
+            document.getElementById('pdfModal').style.display = "none";
+            document.getElementById('pdfViewerFrame').src = "";
+        }
+
+        // Preview Logic for Business Images
+        document.getElementById('business_images').addEventListener('change', function (event) {
+            const files = event.target.files;
+            const container = document.getElementById('imagesPreviewContainer');
+            // Do NOT clear previous here, we want to show existing images too? 
+            // The template shows existing images. We can append or prepend new ones.
+            // But usually this preview is for *new* uploads.
+            // Let's create a separate container or just append to the existing one.
+            // The HTML structure has the container wrapping existing images.
+
+            // Let's just append new images
+            // But if we want to clear *previous selections* if user reselets?
+            // "input file" replaces selection usually.
+
+            // Remove any *previously added preview* elements (imgs that don't have existing-image-wrapper class)
+            // Ideally we separate them. But let's just append for now to be safe with existing logic.
+            // Actually, let's remove elements that are just "img" (newly added) to avoid duplicates if user clicks twice
+            Array.from(container.children).forEach(child => {
+                if (child.tagName === 'IMG' && !child.classList.contains('existing-image')) {
+                    child.remove();
+                }
+            });
+
+            if (files.length > 0) {
+                Array.from(files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = URL.createObjectURL(file);
+                        img.style.width = '100px';
+                        img.style.height = '100px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '4px';
+                        img.style.border = '1px solid #ddd';
+                        // Insert before the existing ones or after? After is fine.
+                        container.appendChild(img);
+                    }
+                });
+            }
+        });
+
+        // Search Logic
+        function searchLocation() {
+            var query = searchInput.value;
+            if (!query) return;
+
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        var lat = parseFloat(data[0].lat);
+                        var lon = parseFloat(data[0].lon);
+                        placeMarker(new L.LatLng(lat, lon));
+                    } else {
+                        alert("Location not found.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Search error:", error);
+                    alert("Error searching location.");
+                });
+        }
+
+        searchBtn.onclick = searchLocation;
+        searchInput.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                searchLocation();
+            }
+        });
+
+        // Get Current Location
+        document.getElementById('getLocationBtn').addEventListener('click', function () {
+            if (navigator.geolocation) {
+                var btn = this;
+                var originalText = btn.innerHTML;
+                btn.textContent = "Fetching...";
+
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    placeMarker(new L.LatLng(lat, lng));
+                    btn.innerHTML = originalText;
+                }, function (error) {
+                    alert("Error fetching location: " + error.message);
+                    btn.innerHTML = originalText;
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        });
+
+        // Unified outside click
+        var pdfModal = document.getElementById('pdfModal');
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+            if (event.target == pdfModal) {
+                pdfModal.style.display = "none";
+                document.getElementById('pdfViewerFrame').src = "";
+            }
+        }
+    </script>
+</body>
+
+</html>

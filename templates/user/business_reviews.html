@@ -1,0 +1,672 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ business.name }} - Reviews</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #6ee7b7;
+            --neutral-50: #f8fafc;
+            --neutral-100: #f1f5f9;
+            --neutral-200: #e2e8f0;
+            --neutral-500: #64748b;
+            --neutral-800: #1e293b;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--neutral-50);
+            color: var(--neutral-800);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--neutral-200);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--neutral-500);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-brand {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .page-container {
+            max-width: 900px;
+            margin: 1.5rem auto;
+            padding: 0 1.5rem 2.5rem;
+        }
+
+        .chat-wrapper {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+            max-height: 800px;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--neutral-200);
+        }
+
+        .chat-header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.15rem;
+        }
+
+        .chat-header p {
+            color: var(--neutral-500);
+            font-size: 0.9rem;
+        }
+
+        .alert {
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem 1.25rem 0.5rem;
+            overflow-y: auto;
+            background: linear-gradient(180deg, var(--neutral-50), #e0f7ec);
+        }
+
+        .review-form {
+            border-top: 1px solid var(--neutral-200);
+            padding: 0.75rem 1rem;
+            background: var(--white);
+        }
+
+        .form-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+
+        .form-textarea {
+            flex: 1;
+            padding: 0.75rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid var(--neutral-200);
+            font-family: inherit;
+            resize: none;
+            min-height: 46px;
+            max-height: 120px;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .login-hint {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 12px;
+            background: var(--neutral-100);
+            color: var(--neutral-500);
+            margin-bottom: 1.5rem;
+        }
+
+        .login-hint a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .review-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+
+        .review-row.me {
+            justify-content: flex-end;
+        }
+
+        .review-row.other {
+            justify-content: flex-start;
+        }
+
+        .review-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .review-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .review-item {
+            max-width: 75%;
+            padding: 0.5rem 0.8rem 0.35rem;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .review-item.me {
+            margin-left: auto;
+            background: #d1fae5;
+            border-bottom-right-radius: 4px;
+        }
+
+        .review-item.other {
+            margin-right: auto;
+            background: var(--white);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .review-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.15rem;
+            gap: 0.5rem;
+        }
+
+        .review-username {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--neutral-800);
+        }
+
+        .review-date {
+            font-size: 0.7rem;
+            color: var(--neutral-500);
+        }
+
+        .review-content {
+            color: var(--neutral-800);
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            margin-top: 0.15rem;
+            font-size: 0.78rem;
+            color: var(--neutral-500);
+        }
+
+        .review-action-btn {
+            border: none;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .review-action-btn.liked {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .replies {
+            margin-top: 0.4rem;
+            margin-left: 2.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .reply-item {
+            display: flex;
+            gap: 0.4rem;
+            align-items: flex-start;
+        }
+
+        .reply-bubble {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 14px;
+            padding: 0.4rem 0.7rem;
+            font-size: 0.86rem;
+            max-width: 80%;
+        }
+
+        .reply-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 0.1rem;
+            font-size: 0.72rem;
+            color: var(--neutral-500);
+        }
+
+        .reply-context {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.25rem 0.75rem;
+            margin-bottom: 0.25rem;
+            border-radius: 999px;
+            background: var(--neutral-100);
+            font-size: 0.8rem;
+            color: var(--neutral-500);
+        }
+
+        .reply-context strong {
+            color: var(--neutral-800);
+        }
+
+        .reply-context button {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--neutral-400);
+        }
+
+        .view-replies-btn {
+            border: none;
+            background: transparent;
+            color: var(--neutral-500);
+            cursor: pointer;
+            font-size: 0.78rem;
+            padding: 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--neutral-500);
+            font-style: italic;
+            padding: 1.5rem 0 0.5rem;
+        }
+
+        .star-rating-input {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            margin-bottom: 0.5rem;
+            margin-left: 0.5rem;
+        }
+
+        .star-rating-input input {
+            display: none;
+        }
+
+        .star-rating-input label {
+            color: #ddd;
+            font-size: 1.2rem;
+            padding: 0 0.1rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star-rating-input input:checked ~ label,
+        .star-rating-input label:hover,
+        .star-rating-input label:hover ~ label {
+            color: #fbbf24;
+        }
+
+        .review-rating {
+            color: #fbbf24;
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .page-container {
+                padding: 0 0.75rem 1.5rem;
+            }
+
+            .chat-wrapper {
+                border-radius: 16px;
+            }
+
+            .review-item {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="{% url 'business_detail' business.id %}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Business
+        </a>
+        <a href="{% url 'dashboard' %}" class="nav-brand">SmALl BiZ hub</a>
+        <div style="width: 100px;"></div>
+    </nav>
+
+    <div class="page-container">
+        <div class="chat-wrapper">
+            <div class="chat-header">
+                <h1>{{ business.name }} - Reviews</h1>
+                <p>{{ business.shop }}</p>
+            </div>
+
+            <div class="chat-messages">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <div class="reviews-list">
+                    {% for review in reviews %}
+                    <div
+                        class="review-row {% if request.session.username and review.user.username == request.session.username %}me{% else %}other{% endif %}"
+                        data-review-id="{{ review.id }}">
+
+                        {% if not request.session.username or review.user.username != request.session.username %}
+                        <div class="review-avatar">
+                            {% if review.user.profile %}
+                            <img src="{{ review.user.profile.url }}" alt="{{ review.user.username }}">
+                            {% elif review.user.google_profile_image %}
+                            <img src="{{ review.user.google_profile_image }}" alt="{{ review.user.username }}">
+                            {% else %}
+                            {{ review.user.username|first|upper }}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <div
+                            class="review-item {% if request.session.username and review.user.username == request.session.username %}me{% else %}other{% endif %}">
+                            <div class="review-meta">
+                                <div>
+                                    <span class="review-username">{{ review.user.username }}</span>
+                                    {% if review.rating %}
+                                    <span class="review-rating">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= review.rating %}
+                                                <i class="fas fa-star"></i>
+                                            {% else %}
+                                                <i class="far fa-star" style="color: #ddd;"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <span class="review-date">{{ review.created_at|date:"M j, Y g:i A" }}</span>
+                            </div>
+                            <div class="review-content">{{ review.content }}</div>
+
+                            <div class="review-actions">
+                                <button type="button" class="review-action-btn like-btn"
+                                    data-review-id="{{ review.id }}">
+                                    <i class="fas fa-heart"></i>
+                                    <span class="like-count">{{ review.total_likes }}</span>
+                                </button>
+                                {% if request.session.username %}
+                                <button type="button" class="review-action-btn reply-toggle"
+                                    data-review-id="{{ review.id }}" data-username="{{ review.user.username }}">
+                                    <i class="fas fa-reply"></i>
+                                    Reply
+                                </button>
+                                {% endif %}
+
+                                {% with reply_count=review.replies.count %}
+                                {% if reply_count > 0 %}
+                                <button type="button" class="view-replies-btn" data-review-id="{{ review.id }}"
+                                    data-count="{{ reply_count }}">
+                                    View replies ({{ reply_count }})
+                                </button>
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+
+                        {% if request.session.username and review.user.username == request.session.username %}
+                        <div class="review-avatar">
+                            {% if review.user.profile %}
+                            <img src="{{ review.user.profile.url }}" alt="{{ review.user.username }}">
+                            {% elif review.user.google_profile_image %}
+                            <img src="{{ review.user.google_profile_image }}" alt="{{ review.user.username }}">
+                            {% else %}
+                            {{ review.user.username|first|upper }}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {# Replies (hidden by default, toggled by View replies button) #}
+                    {% if review.replies.all %}
+                    <div class="replies" id="replies-{{ review.id }}" style="display:none;">
+                        {% for reply in review.replies.all %}
+                        <div class="reply-item">
+                            <div class="review-avatar" style="width: 26px; height: 26px; font-size: 0.75rem;">
+                                {% if reply.user.profile %}
+                                <img src="{{ reply.user.profile.url }}" alt="{{ reply.user.username }}">
+                                {% elif reply.user.google_profile_image %}
+                                <img src="{{ reply.user.google_profile_image }}" alt="{{ reply.user.username }}">
+                                {% else %}
+                                {{ reply.user.username|first|upper }}
+                                {% endif %}
+                            </div>
+                            <div class="reply-bubble">
+                                <div class="reply-meta">
+                                    <span>{{ reply.user.username }}</span>
+                                    <span>{{ reply.created_at|date:"M j, Y g:i A" }}</span>
+                                </div>
+                                <div>{{ reply.content }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% empty %}
+                    <p class="empty-state">No reviews yet. Be the first!</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if request.session.username %}
+            <div class="review-form">
+                <form method="post" action="{% url 'post_review' business.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="parent_id" id="parent-id-input">
+                    <div id="reply-context" class="reply-context" style="display:none;">
+                        <span>Replying to <strong id="reply-to-name"></strong></span>
+                        <button type="button" id="cancel-reply">✕</button>
+                    </div>
+                    
+                    <div class="star-rating-input">
+                        <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
+                        <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
+                        <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
+                        <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
+                        <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"><i class="fas fa-star"></i></label>
+                    </div>
+
+                    <div class="form-row">
+                        <textarea name="content" id="main-content-input" class="form-textarea" rows="1" required
+                            placeholder="Type your review..."></textarea>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div class="login-hint">
+                Please <a href="{% url 'login' %}">login</a> to post a review.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+
+    </html>
+
+    <script>
+    // Like button handler
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.like-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const reviewId = this.dataset.reviewId;
+                const button = this;
+                fetch(`/users/review-like/${reviewId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const countSpan = button.querySelector('.like-count');
+                            if (countSpan) {
+                                countSpan.textContent = data.likes_count;
+                            }
+                            if (data.liked) {
+                                button.classList.add('liked');
+                            } else {
+                                button.classList.remove('liked');
+                            }
+                        }
+                    })
+                    .catch(err => console.error('Error liking review:', err));
+            });
+        });
+
+        const parentInput = document.getElementById('parent-id-input');
+        const replyContext = document.getElementById('reply-context');
+        const replyToName = document.getElementById('reply-to-name');
+        const mainInput = document.getElementById('main-content-input');
+        const cancelReplyBtn = document.getElementById('cancel-reply');
+
+        // Reply toggle: set context and parent_id using bottom form
+        document.querySelectorAll('.reply-toggle').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const reviewId = this.dataset.reviewId;
+                const username = this.dataset.username;
+                if (!parentInput || !replyContext || !replyToName || !mainInput) return;
+
+                parentInput.value = reviewId;
+                replyToName.textContent = '@' + username;
+                replyContext.style.display = 'flex';
+                mainInput.focus();
+            });
+        });
+
+        // Cancel reply context
+        if (cancelReplyBtn) {
+            cancelReplyBtn.addEventListener('click', function () {
+                if (!parentInput || !replyContext) return;
+                parentInput.value = '';
+                replyContext.style.display = 'none';
+            });
+        }
+
+        // View replies toggle
+        document.querySelectorAll('.view-replies-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const reviewId = this.dataset.reviewId;
+                const repliesContainer = document.getElementById(`replies-${reviewId}`);
+                if (!repliesContainer) return;
+                const isHidden = repliesContainer.style.display === 'none' || repliesContainer.style.display === '';
+                repliesContainer.style.display = isHidden ? 'block' : 'none';
+                if (isHidden) {
+                    this.textContent = 'Hide replies (' + this.dataset.count + ')';
+                } else {
+                    this.textContent = 'View replies (' + this.dataset.count + ')';
+                }
+            });
+        });
+    });
+    </script>

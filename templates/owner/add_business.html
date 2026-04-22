@@ -1,0 +1,1391 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="referrer" content="origin">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Your Business - Owner Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <style>
+        /* --- Base Styles from Home.html --- */
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-gray: #f8f9fa;
+            --text-dark: #1f2937;
+            --text-gray: #6b7280;
+            --border-light: #e5e7eb;
+            --white: #ffffff;
+            --sidebar-width: 280px;
+            --sidebar-width-collapsed: 80px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            display: flex;
+            min-height: 100vh;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        /* --- Sidebar Styles --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--white);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        body.sidebar-closed .sidebar {
+            width: var(--sidebar-width-collapsed);
+        }
+
+        .logo-container {
+            padding: 2rem 1.5rem;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 80px;
+            gap: 1rem;
+        }
+
+        body.sidebar-closed .logo-container {
+            justify-content: center;
+            padding: 1rem;
+            gap: 0;
+        }
+
+        .logo-img {
+            max-width: 130px;
+            height: auto;
+            transition: all 0.3s;
+            margin-top: 12px;
+        }
+
+        body.sidebar-closed .logo-img {
+            display: none;
+        }
+
+        #sidebarToggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: color 0.2s;
+            min-width: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #sidebarToggle:hover {
+            color: var(--primary);
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .nav-section-title {
+            color: var(--text-gray);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin: 1.5rem 0 0.75rem 0.75rem;
+            text-transform: uppercase;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        body.sidebar-closed .nav-section-title {
+            opacity: 0;
+            visibility: hidden;
+            height: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        body.sidebar-closed .nav-item {
+            justify-content: center;
+            padding: 0.75rem 0;
+        }
+
+        .nav-item i {
+            width: 1.5rem;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: margin 0.3s;
+        }
+
+        body.sidebar-closed .nav-item i {
+            margin-right: 0;
+            font-size: 1.25rem;
+        }
+
+        .nav-item span {
+            transition: opacity 0.3s;
+        }
+
+        body.sidebar-closed .nav-item span {
+            display: none;
+        }
+
+        .nav-item:hover {
+            background-color: #eff6ff;
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .nav-item.active:hover {
+            color: var(--white);
+        }
+
+        .user-profile {
+            padding: 1rem;
+            border-top: 1px solid var(--border-light);
+            margin: 1rem;
+            display: flex;
+            align-items: center;
+            background-color: #f8fafc;
+            border-radius: 0.75rem;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        body.sidebar-closed .user-profile {
+            padding: 0.5rem;
+            margin: 0.5rem;
+            justify-content: center;
+            background-color: transparent;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .avatar {
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            background-color: #f97316;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 0.75rem;
+            transition: margin 0.3s;
+        }
+
+        body.sidebar-closed .avatar {
+            margin-right: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+            transition: opacity 0.3s;
+        }
+
+        body.sidebar-closed .user-info {
+            display: none;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+        }
+
+        .logout-btn {
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        body.sidebar-closed .logout-btn {
+            display: block;
+            margin-left: 0;
+        }
+
+        .logout-btn:hover {
+            color: var(--primary);
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem 3rem;
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.3s ease;
+        }
+
+        body.sidebar-closed .main-content {
+            margin-left: var(--sidebar-width-collapsed);
+            width: calc(100% - var(--sidebar-width-collapsed));
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.25rem;
+        }
+
+        /* --- Form Styles (Adapted from Add Business) --- */
+        form {
+            display: flex;
+            flex-direction: column;
+            /* Container styling removed as per request */
+        }
+
+        label {
+            margin-top: 15px;
+            font-weight: 600;
+            color: #34495e;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        input[type="url"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            background-color: #fff;
+            /* Ensure white background on inputs */
+        }
+
+        input[type="text"]:focus,
+        input[type="url"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Consistent button styles using Home theme variables where possible, or keeping specific form button styles */
+        button[type="submit"] {
+            margin-top: 30px;
+            padding: 12px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        button[type="submit"]:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background-color: #f97316;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #ea580c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary svg {
+            margin-right: 6px;
+        }
+
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .help-text {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .address-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .address-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 2rem 1rem;
+            }
+        }
+
+        /* Map specific styles */
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 2px solid #ddd;
+            z-index: 1;
+        }
+
+        /* Hours Table */
+        .hours-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background-color: #fff;
+            /* Table background */
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .hours-table th,
+        .hours-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .hours-table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .hours-table input[type="time"] {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            margin-top: 0;
+        }
+
+        /* Social Media Row Styles */
+        .social-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .remove-social-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0 12px;
+            height: 45px;
+            /* Match input height roughly */
+            cursor: pointer;
+            width: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            /* Higher than sidebar */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+
+<body class="sidebar-closed"> <!-- Default closed -->
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="logo-container">
+            <button id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="{% static 'logo.png' %}" alt="Logo" class="logo-img">
+        </div>
+
+        <div class="nav-menu">
+            <a href="/home" class="nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <div class="nav-section-title">MANAGEMENT</div>
+            <a href="/addbusiness" class="nav-item active">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add Business</span>
+            </a>
+
+            <a href="/manage_business" class="nav-item">
+                <i class="fas fa-building"></i>
+                <span>My Businesses</span>
+            </a>
+
+            <div class="nav-section-title">SUPPORT</div>
+            <a href="/contact" class="nav-item">
+                <i class="fas fa-headset"></i>
+                <span>Contact Support</span>
+            </a>
+        </div>
+
+        <a href="{% url 'owner_profile' %}" style="text-decoration: none; color: inherit;">
+            <div class="user-profile">
+                <div class="avatar" {% if owner.profile_image %}style="background: none; padding: 0;" {% endif %}>
+                    {% if owner.profile_image %}
+                    <img src="{{ owner.profile_image }}" alt="Profile"
+                        style="width: 100%; height: 100%; border-radius: 8px; object-fit: cover;">
+                    {% else %}
+                    {{ user_email|make_list|first|upper }}
+                    {% endif %}
+                </div>
+                <div class="user-info">
+                    <div class="user-name">{{ user_email|default:"User" }}</div>
+                    <div class="user-role">Owner Account</div>
+                </div>
+                <a href="{% url 'ologout' %}" class="logout-btn" title="Logout" onclick="event.stopPropagation();">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <h1 class="page-title">Add Your Business</h1>
+            <p style="color: var(--text-gray);">Fill in the details to register your new business.</p>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="message">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" id="businessForm">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="message error-message"
+                style="color: #dc3545; background-color: #f8d7da; border-color: #f5c6cb;">
+                <p style="margin: 0; font-weight: bold;">Please fix the following errors:</p>
+                <ul style="margin: 5px 0; padding-left: 20px;">
+                    {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                    <li>{{ field|title }}: {{ error }}</li>
+                    {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- User Details (Read-only) -->
+            <div class="form-group">
+                <label>Owner Details</label>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <label for="name" style="font-size: 0.9em; margin-top: 5px; color: #666;">Name</label>
+                        <input type="text" name="name" value="{{ form.name.value|default:'' }}" readonly
+                            style="background-color: #e9ecef;">
+                    </div>
+                    <div style="flex: 1; min-width: 250px;">
+                        <label for="email" style="font-size: 0.9em; margin-top: 5px; color: #666;">Email</label>
+                        <input type="text" value="{{ user_email }}" readonly style="background-color: #e9ecef;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="shop">Shop Name</label>
+                {{ form.shop }}
+                {% if form.shop.errors %}
+                <div class="error-message">{{ form.shop.errors }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Hidden element carrying Django context values for JS -->
+            <span id="phoneDataEl" style="display:none;"
+                data-profile-phone="{{ profile_phone }}"
+                data-verified="{% if profile_phone_verified %}true{% else %}false{% endif %}"></span>
+
+            <div class="form-group">
+                <label for="id_mobile_number">Mobile Number</label>
+                <div style="position: relative;">
+                    {{ form.mobile_number }}
+                    <span id="phoneVerifiedBadge" style="display:none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; border-radius: 20px; padding: 2px 10px; font-size: 13px; font-weight: 600;">
+                        <i class="fas fa-check-circle"></i> Verified
+                    </span>
+                </div>
+                <div id="phoneStatusMsg" style="margin-top: 6px; font-size: 13px;"></div>
+                <button type="button" id="verifyPhoneBtn" class="btn-secondary" style="margin-top: 8px; display: none;">
+                    <i class="fas fa-shield-alt" style="margin-right:5px;"></i> Verify Number
+                </button>
+                {% if form.mobile_number.errors %}
+                <div class="error-message">{{ form.mobile_number.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="business_type">Type of Business</label>
+                {{ form.business_type }}
+                {% if form.business_type.errors %}
+                <div class="error-message">{{ form.business_type.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="proof_of_business">Proof of business owned</label>
+                <input type="file" id="proof_of_business" name="proof_of_business" accept=".pdf,image/*">
+                <div class="help-text">Upload a PDF or Image as proof of ownership</div>
+                <!-- Preview Container for Proof -->
+                <div id="proofPreviewContainer" style="margin-top: 10px; display: none;">
+                    <p style="margin:0; font-weight:600; font-size:14px; margin-bottom:5px;">Preview:</p>
+                    <div id="proofPreviewContent"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="business_images">Business Image(s)</label>
+                <input type="file" id="business_images" name="business_images" accept="image/*" multiple required>
+                <div class="help-text">Add Geo tag images of your shops</div>
+                <!-- Preview Container for Business Images -->
+                <div id="imagesPreviewContainer" style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Business Location</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button type="button" id="openMapBtn" class="btn-secondary" style="margin-top: 0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="margin-right: 5px; vertical-align: text-bottom;">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        Pick Location on Map
+                    </button>
+                    <span id="locationStatus" style="color: #666; font-size: 14px;">No location selected</span>
+                </div>
+                <!-- Hidden Fields for Lat/Long -->
+                {{ form.latitude }}
+                {{ form.longitude }}
+                <!-- Legacy/Hidden Field -->
+                {{ form.google_map_location }}
+            </div>
+
+            <div class="form-group">
+                <label for="business_address">Business Address</label>
+                {{ form.business_address }}
+                {% if form.business_address.errors %}
+                <div class="error-message">{{ form.business_address.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="address-grid">
+                <div class="form-group">
+                    <label for="id_city">City/Town</label>
+                    {{ form.city }}
+                </div>
+                <div class="form-group">
+                    <label for="id_district">District</label>
+                    {{ form.district }}
+                </div>
+                <div class="form-group">
+                    <label for="id_state">State</label>
+                    {{ form.state }}
+                </div>
+                <div class="form-group">
+                    <label for="id_postal_code">Postal Code</label>
+                    {{ form.postal_code }}
+                </div>
+                <div class="form-group">
+                    <label for="id_country">Country</label>
+                    {{ form.country }}
+                </div>
+                <div class="form-group">
+                    <label for="id_landmark">Landmark</label>
+                    <input type="text" name="landmark" id="id_landmark" placeholder="Near post office, etc.">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Business Description</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <div class="error-message">{{ form.description.errors }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Social Media Links (Dynamic) -->
+            <div class="form-group">
+                <label>Social Media Links</label>
+                <div id="socialMediaContainer">
+                    <!-- Dynamic rows will be added here -->
+                </div>
+                <button type="button" id="addSocialBtn" class="btn-secondary"
+                    style="width: auto; font-size: 14px; padding: 8px 15px;">+ Add Social Link</button>
+            </div>
+
+            <!-- Structured Operating Hours -->
+            <div class="form-group">
+                <label>Hours of Operation</label>
+                <div class="hours-actions" style="margin-bottom: 10px;">
+                    <button type="button" class="btn-secondary" onclick="applyMondayToAll()"
+                        style="font-size: 12px; padding: 5px 10px; width: auto; background-color: #3498db;">Apply
+                        Monday's Hours to All Days</button>
+                </div>
+                <div class="hours-container">
+                    <table class="hours-table">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Open Time</th>
+                                <th>Close Time</th>
+                                <th>Closed?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="day-row" data-day="0">
+                                <td>Monday</td>
+                                <td><input type="time" name="hours_open_0"></td>
+                                <td><input type="time" name="hours_close_0"></td>
+                                <td><input type="checkbox" name="hours_closed_0" onchange="toggleHours(0)"></td>
+                            </tr>
+                            <tr class="day-row" data-day="1">
+                                <td>Tuesday</td>
+                                <td><input type="time" name="hours_open_1"></td>
+                                <td><input type="time" name="hours_close_1"></td>
+                                <td><input type="checkbox" name="hours_closed_1" onchange="toggleHours(1)"></td>
+                            </tr>
+                            <tr class="day-row" data-day="2">
+                                <td>Wednesday</td>
+                                <td><input type="time" name="hours_open_2"></td>
+                                <td><input type="time" name="hours_close_2"></td>
+                                <td><input type="checkbox" name="hours_closed_2" onchange="toggleHours(2)"></td>
+                            </tr>
+                            <tr class="day-row" data-day="3">
+                                <td>Thursday</td>
+                                <td><input type="time" name="hours_open_3"></td>
+                                <td><input type="time" name="hours_close_3"></td>
+                                <td><input type="checkbox" name="hours_closed_3" onchange="toggleHours(3)"></td>
+                            </tr>
+                            <tr class="day-row" data-day="4">
+                                <td>Friday</td>
+                                <td><input type="time" name="hours_open_4"></td>
+                                <td><input type="time" name="hours_close_4"></td>
+                                <td><input type="checkbox" name="hours_closed_4" onchange="toggleHours(4)"></td>
+                            </tr>
+                            <tr class="day-row" data-day="5">
+                                <td>Saturday</td>
+                                <td><input type="time" name="hours_open_5"></td>
+                                <td><input type="time" name="hours_close_5"></td>
+                                <td><input type="checkbox" name="hours_closed_5" onchange="toggleHours(5)"></td>
+                            </tr>
+                            <tr class="day-row" data-day="6">
+                                <td>Sunday</td>
+                                <td><input type="time" name="hours_open_6"></td>
+                                <td><input type="time" name="hours_close_6"></td>
+                                <td><input type="checkbox" name="hours_closed_6" onchange="toggleHours(6)"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">
+                Add Business
+                <span class="loader" id="loader"></span>
+            </button>
+        </form>
+    </main>
+
+    <!-- Map Modal -->
+    <div id="mapModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Select Location</h3>
+
+            <div class="search-container">
+                <input type="text" id="locationSearch" placeholder="Search by pincode, city, or area...">
+                <button type="button" id="searchBtn" class="btn-secondary" style="margin-top:0;">Search</button>
+            </div>
+
+            <button type="button" id="getLocationBtn" class="btn-secondary"
+                style="margin-bottom: 10px; width: auto; margin-top:0;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="margin-right: 5px; vertical-align: text-bottom;">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Use My Current Location
+            </button>
+
+            <div id="map"></div>
+
+            <div style="margin-top: 15px; text-align: right;">
+                <button type="button" id="confirmLocationBtn" class="btn-secondary" style="margin-top: 0;">Confirm
+                    Location</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Viewer Modal -->
+    <div id="pdfModal" class="modal">
+        <div class="modal-content"
+            style="height: 80vh; width: 90%; max-width: 1000px; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin: 0;">Proof of Business Preview</h3>
+                <span class="close-pdf-modal" style="font-size: 28px; cursor: pointer;">&times;</span>
+            </div>
+            <iframe id="pdfViewerFrame" src=""
+                style="width: 100%; flex-grow: 1; border: none; border-radius: 4px;"></iframe>
+        </div>
+    </div>
+
+    <!-- Phone Verification Modal -->
+    <div id="phoneOtpModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center; padding: 2rem;">
+            <span id="closePhoneModalBtn" style="cursor: pointer; float: right; font-size: 24px; color: #aaa;">&times;</span>
+            <h2 style="margin-bottom: 1rem; margin-top: 0;">Phone Verification</h2>
+            <p style="color: #666; margin-bottom: 1rem;">Enter the OTP code shown below to verify your number.</p>
+            <div id="phoneOtpDisplay" style="background: #fef3c7; color: #92400e; padding: 1rem; border-radius: 12px; font-size: 2rem; letter-spacing: 0.5rem; font-weight: 700; margin-bottom: 1.5rem; border: 2px dashed #f59e0b;"></div>
+            <input type="text" id="phoneOtpInput" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 2px solid #ddd; text-align: center; font-size: 1.5rem; font-weight: 700; letter-spacing: 0.2rem; margin-bottom: 1.5rem; box-sizing: border-box;" maxlength="6" placeholder="000000">
+            <button type="button" id="confirmPhoneOtpBtn" style="width: 100%; padding: 12px; border-radius: 8px; border: none; background-color: #2563eb; color: white; font-size: 16px; font-weight: 600; cursor: pointer;">Confirm Verification</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Sidebar Logic ---
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.body.classList.toggle('sidebar-closed');
+        });
+
+        // --- Business Form Logic ---
+
+        document.getElementById('businessForm').addEventListener('submit', function (e) {
+            var submitBtn = document.getElementById('submitBtn');
+            var loader = document.getElementById('loader');
+
+            // Lock the button
+            submitBtn.disabled = true;
+            // Provide visual feedback
+            submitBtn.innerHTML = 'Processing... <span class="loader" style="display: inline-block;"></span>';
+        });
+
+        // Toggle Hours Input
+        function toggleHours(dayIndex) {
+            var checkbox = document.querySelector(`input[name="hours_closed_${dayIndex}"]`);
+            var openInput = document.querySelector(`input[name="hours_open_${dayIndex}"]`);
+            var closeInput = document.querySelector(`input[name="hours_close_${dayIndex}"]`);
+
+            if (checkbox.checked) {
+                openInput.disabled = true;
+                closeInput.disabled = true;
+                openInput.value = '';
+                closeInput.value = '';
+                openInput.style.backgroundColor = '#f0f0f0';
+                closeInput.style.backgroundColor = '#f0f0f0';
+            } else {
+                openInput.disabled = false;
+                closeInput.disabled = false;
+                openInput.style.backgroundColor = 'white';
+                closeInput.style.backgroundColor = 'white';
+            }
+        }
+
+        // Apply Monday to All
+        function applyMondayToAll() {
+            var monOpen = document.querySelector('input[name="hours_open_0"]').value;
+            var monClose = document.querySelector('input[name="hours_close_0"]').value;
+            var monClosed = document.querySelector('input[name="hours_closed_0"]').checked;
+
+            for (var i = 1; i <= 6; i++) {
+                document.querySelector(`input[name="hours_open_${i}"]`).value = monOpen;
+                document.querySelector(`input[name="hours_close_${i}"]`).value = monClose;
+                var checkbox = document.querySelector(`input[name="hours_closed_${i}"]`);
+                checkbox.checked = monClosed;
+                toggleHours(i); // Update UI state
+            }
+        }
+
+        // Social Media Logic
+        var socialContainer = document.getElementById('socialMediaContainer');
+        var addSocialBtn = document.getElementById('addSocialBtn');
+        var socialCount = 0;
+
+        if (addSocialBtn) {
+            addSocialBtn.addEventListener('click', function () {
+                socialCount++;
+                var div = document.createElement('div');
+                div.className = 'social-row';
+                div.innerHTML = `
+                    <select name="social_platform_${socialCount}" style="flex:1;">
+                        <option value="">Select Platform</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Twitter">Twitter/X</option>
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="YouTube">YouTube</option>
+                        <option value="Website">Website</option>
+                    </select>
+                    <input type="url" name="social_url_${socialCount}" placeholder="https://..." style="flex:2;">
+                    <button type="button" class="remove-social-btn" onclick="this.parentElement.remove()">X</button>
+                `;
+                socialContainer.appendChild(div);
+            });
+        }
+
+        // Map & Modal Logic
+        var map, marker;
+        var modal = document.getElementById("mapModal");
+        var openBtn = document.getElementById("openMapBtn");
+        var closeSpan = document.getElementsByClassName("close-modal")[0];
+        var confirmBtn = document.getElementById("confirmLocationBtn");
+        var searchBtn = document.getElementById("searchBtn");
+        var searchInput = document.getElementById("locationSearch");
+
+        // Open Modal
+        openBtn.onclick = function () {
+            modal.style.display = "block";
+            if (!map) {
+                initMap();
+            } else {
+                setTimeout(function () { map.invalidateSize(); }, 200);
+            }
+        }
+
+        // Close Modal
+        closeSpan.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // Close on outside click
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function initMap() {
+            map = L.map('map').setView([20.5937, 78.9629], 5); // Default India
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            map.on('click', onMapClick);
+        }
+
+        function onMapClick(e) {
+            placeMarker(e.latlng);
+        }
+
+        function placeMarker(latlng) {
+            if (marker) {
+                marker.setLatLng(latlng);
+            } else {
+                marker = L.marker(latlng, { draggable: true }).addTo(map);
+                marker.on('dragend', function (event) {
+                    // Optional: Update UI immediately or wait for confirm
+                });
+            }
+            map.flyTo(latlng, 16);
+        }
+
+        // Confirm Location
+        confirmBtn.onclick = function () {
+            if (marker) {
+                var position = marker.getLatLng();
+                updateLocationFields(position.lat, position.lng);
+                modal.style.display = "none";
+                document.getElementById("locationStatus").innerText = "Location Selected";
+                document.getElementById("locationStatus").style.color = "#27ae60";
+            } else {
+                alert("Please select a location on the map first.");
+            }
+        }
+
+        function updateLocationFields(lat, lng) {
+            // Round to 6 decimal places to match Django DecimalField(max_digits=9, decimal_places=6)
+            var latFixed = lat.toFixed(6);
+            var lngFixed = lng.toFixed(6);
+
+            document.getElementById('id_latitude').value = latFixed;
+            document.getElementById('id_longitude').value = lngFixed;
+            document.getElementById('id_google_map_location').value = latFixed + "," + lngFixed;
+
+            // Reverse Geocoding
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                .then(response => response.json())
+                .then(data => {
+                    const address = data.address;
+                    if (data.display_name) {
+                        document.getElementById('id_business_address').value = data.display_name;
+                    }
+                    if (address.city || address.town || address.village) document.getElementById('id_city').value = address.city || address.town || address.village || '';
+                    if (address.state_district || address.county) document.getElementById('id_district').value = address.state_district || address.county || '';
+                    if (address.state) document.getElementById('id_state').value = address.state || '';
+                    if (address.postcode) document.getElementById('id_postal_code').value = address.postcode || '';
+                    if (address.country) document.getElementById('id_country').value = address.country || '';
+                })
+                .catch(error => console.error('Error fetching address:', error));
+        }
+
+        // Preview Logic for Proof of Business
+        document.getElementById('proof_of_business').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const container = document.getElementById('proofPreviewContainer');
+            const content = document.getElementById('proofPreviewContent');
+
+            content.innerHTML = ''; // Clear previous preview
+
+            if (file) {
+                container.style.display = 'block';
+                const fileType = file.type;
+                const fileUrl = URL.createObjectURL(file);
+
+                if (fileType.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = fileUrl;
+                    img.style.maxWidth = '200px';
+                    img.style.maxHeight = '200px';
+                    img.style.borderRadius = '8px';
+                    img.style.border = '1px solid #ddd';
+                    content.appendChild(img);
+                } else if (fileType === 'application/pdf') {
+                    content.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; width: fit-content;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            <span style="font-size: 14px; color: #333; margin-right: 10px;">${file.name}</span>
+                            <button type="button" id="viewPdfBtn" class="btn-secondary" style="margin: 0; padding: 5px 10px; font-size: 12px; height: auto;">View PDF</button>
+                        </div>
+                    `;
+
+                    document.getElementById('viewPdfBtn').addEventListener('click', function () {
+                        const pdfModal = document.getElementById('pdfModal');
+                        const pdfFrame = document.getElementById('pdfViewerFrame');
+                        pdfFrame.src = fileUrl;
+                        pdfModal.style.display = "block";
+                    });
+                } else {
+                    content.innerHTML = `<span style="color: #666; font-size: 14px;">${file.name}</span>`;
+                }
+            } else {
+                container.style.display = 'none';
+            }
+        });
+
+        // PDF Modal Close Logic
+        document.querySelector('.close-pdf-modal').onclick = function () {
+            document.getElementById('pdfModal').style.display = "none";
+            document.getElementById('pdfViewerFrame').src = ""; // Clear src to stop loading
+        }
+
+        // Preview Logic for Business Images
+        document.getElementById('business_images').addEventListener('change', function (event) {
+            const files = event.target.files;
+            const container = document.getElementById('imagesPreviewContainer');
+            container.innerHTML = ''; // Clear previous
+
+            if (files.length > 0) {
+                Array.from(files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = URL.createObjectURL(file);
+                        img.style.width = '100px';
+                        img.style.height = '100px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '8px';
+                        img.style.border = '1px solid #ddd';
+                        container.appendChild(img);
+                    }
+                });
+            }
+        });
+
+        // Search Logic
+        function searchLocation() {
+            var query = searchInput.value;
+            if (!query) return;
+
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        var lat = parseFloat(data[0].lat);
+                        var lon = parseFloat(data[0].lon);
+                        placeMarker(new L.LatLng(lat, lon));
+                    } else {
+                        alert("Location not found.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Search error:", error);
+                    alert("Error searching location.");
+                });
+        }
+
+        searchBtn.onclick = searchLocation;
+        searchInput.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Prevent form submission
+                searchLocation();
+            }
+        });
+
+        // Get Current Location
+        document.getElementById('getLocationBtn').addEventListener('click', function () {
+            if (navigator.geolocation) {
+                var btn = this;
+                var originalText = btn.innerHTML;
+                btn.textContent = "Fetching...";
+
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    placeMarker(new L.LatLng(lat, lng));
+                    btn.innerHTML = originalText;
+                }, function (error) {
+                    alert("Error fetching location: " + error.message);
+                    btn.innerHTML = originalText;
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        });
+
+        // --- Phone Verification Logic ---
+        (function () {
+            const mobileInput = document.getElementById('id_mobile_number');
+            const verifyPhoneBtn = document.getElementById('verifyPhoneBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const phoneOtpModal = document.getElementById('phoneOtpModal');
+            const phoneOtpDisplay = document.getElementById('phoneOtpDisplay');
+            const phoneOtpInput = document.getElementById('phoneOtpInput');
+            const confirmPhoneOtpBtn = document.getElementById('confirmPhoneOtpBtn');
+            const closePhoneModalBtn = document.getElementById('closePhoneModalBtn');
+            const verifiedBadge = document.getElementById('phoneVerifiedBadge');
+            const phoneStatusMsg = document.getElementById('phoneStatusMsg');
+
+            // Profile phone injected from Django context
+            const phoneDataEl = document.getElementById('phoneDataEl');
+            const profilePhone = phoneDataEl.dataset.profilePhone;
+            const profilePhoneVerified = phoneDataEl.dataset.verified === 'true';
+
+            function setVerifiedState(verified, msg, msgColor) {
+                if (verified) {
+                    submitBtn.disabled = false;
+                    verifyPhoneBtn.style.display = 'none';
+                    if (verifiedBadge) verifiedBadge.style.display = 'inline-block';
+                    if (phoneStatusMsg) {
+                        phoneStatusMsg.textContent = msg || '';
+                        phoneStatusMsg.style.color = msgColor || '#059669';
+                    }
+                } else {
+                    submitBtn.disabled = true;
+                    verifyPhoneBtn.style.display = 'inline-flex';
+                    if (verifiedBadge) verifiedBadge.style.display = 'none';
+                    if (phoneStatusMsg) {
+                        phoneStatusMsg.textContent = msg || 'This number needs to be verified before submitting.';
+                        phoneStatusMsg.style.color = msgColor || '#dc2626';
+                    }
+                }
+            }
+
+            function isProfilePhone(val) {
+                return profilePhone && profilePhoneVerified && val === profilePhone;
+            }
+
+            // Set initial state
+            (function checkInitial() {
+                const val = mobileInput.value.trim();
+                if (isProfilePhone(val)) {
+                    setVerifiedState(true, 'Using your verified profile number.');
+                } else if (!val) {
+                    submitBtn.disabled = false;
+                    verifyPhoneBtn.style.display = 'none';
+                    if (verifiedBadge) verifiedBadge.style.display = 'none';
+                    if (phoneStatusMsg) phoneStatusMsg.textContent = '';
+                } else {
+                    setVerifiedState(false, 'Please verify this number before submitting.');
+                }
+            })();
+
+            function closePhoneModal() {
+                phoneOtpModal.style.display = 'none';
+            }
+
+            if (closePhoneModalBtn) closePhoneModalBtn.onclick = closePhoneModal;
+
+            // React when user edits the mobile field
+            mobileInput.addEventListener('input', function () {
+                const val = mobileInput.value.trim();
+                if (isProfilePhone(val)) {
+                    setVerifiedState(true, 'Using your verified profile number.');
+                } else if (!val) {
+                    submitBtn.disabled = false;
+                    verifyPhoneBtn.style.display = 'none';
+                    if (verifiedBadge) verifiedBadge.style.display = 'none';
+                    if (phoneStatusMsg) phoneStatusMsg.textContent = '';
+                } else {
+                    setVerifiedState(false, 'New number entered — please verify before submitting.');
+                }
+            });
+
+            // Send OTP
+            verifyPhoneBtn.onclick = async function () {
+                const phone = mobileInput.value.trim();
+                if (!phone || phone.length < 10) {
+                    alert('Please enter a valid phone number (at least 10 digits).');
+                    return;
+                }
+                verifyPhoneBtn.disabled = true;
+                verifyPhoneBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:5px;"></i> Sending...';
+                const fd = new FormData();
+                fd.append('phone_number', phone);
+                try {
+                    const res = await fetch("{% url 'generate_phone_otp' %}", { method: 'POST', body: fd });
+                    const data = await res.json();
+                    if (data.success) {
+                        phoneOtpDisplay.textContent = data.otp;
+                        phoneOtpInput.value = '';
+                        phoneOtpModal.style.display = 'block';
+                    } else {
+                        alert(data.message || 'Failed to send OTP.');
+                    }
+                } catch (e) {
+                    alert('Error sending OTP. Please try again.');
+                } finally {
+                    verifyPhoneBtn.disabled = false;
+                    verifyPhoneBtn.innerHTML = '<i class="fas fa-shield-alt" style="margin-right:5px;"></i> Verify Number';
+                }
+            };
+
+            // Confirm OTP
+            confirmPhoneOtpBtn.onclick = async function () {
+                const otp = phoneOtpInput.value.trim();
+                if (otp.length !== 6) {
+                    alert('Please enter the 6-digit OTP shown above.');
+                    return;
+                }
+                confirmPhoneOtpBtn.disabled = true;
+                confirmPhoneOtpBtn.textContent = 'Verifying...';
+                const fd = new FormData();
+                fd.append('otp', otp);
+                try {
+                    const res = await fetch("{% url 'verify_phone_otp' %}", { method: 'POST', body: fd });
+                    const data = await res.json();
+                    if (data.success) {
+                        closePhoneModal();
+                        setVerifiedState(true, 'Number verified successfully!');
+                    } else {
+                        alert(data.message || 'Incorrect OTP. Please try again.');
+                    }
+                } catch (e) {
+                    alert('Error verifying OTP. Please try again.');
+                } finally {
+                    confirmPhoneOtpBtn.disabled = false;
+                    confirmPhoneOtpBtn.textContent = 'Confirm Verification';
+                }
+            };
+        })();
+
+        // --- Unified window.onclick handler ---
+        var pdfModal = document.getElementById('pdfModal');
+        var phoneOtpModal = document.getElementById('phoneOtpModal');
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+            if (event.target == pdfModal) {
+                pdfModal.style.display = "none";
+                document.getElementById('pdfViewerFrame').src = "";
+            }
+            if (event.target == phoneOtpModal) {
+                phoneOtpModal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+
+</html>

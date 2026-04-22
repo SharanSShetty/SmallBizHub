@@ -1,0 +1,986 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmallBiz Hub - Business Management Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Updated color scheme to blue + orange professional theme */
+        :root {
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e3a8a;
+            --accent: #f97316;
+            --accent-light: #fb923c;
+            --accent-dark: #d97706;
+            --success: #10b981;
+            --white: #ffffff;
+            --neutral-50: #f9fafb;
+            --neutral-100: #f3f4f6;
+            --neutral-200: #e5e7eb;
+            --neutral-700: #374151;
+            --neutral-900: #111827;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--white);
+            color: var(--neutral-700);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Header/Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 999;
+            border-bottom: 1px solid rgba(30, 64, 175, 0.08);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--neutral-700);
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Updated button colors for blue + orange theme */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(30, 64, 175, 0.35);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            background: var(--white);
+            padding: 6rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Updated gradient colors for hero background */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -20%;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -20%;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(30, 64, 175, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-30px);
+            }
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            color: var(--neutral-900);
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        /* Updated gradient text for main heading */
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--neutral-700);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Stats Section */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 6rem;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--neutral-200);
+            text-align: center;
+        }
+
+        .stat-item {
+            animation: fadeInUp 0.8s ease-out both;
+        }
+
+        .stat-item:nth-child(1) {
+            animation-delay: 0.3s;
+        }
+
+        .stat-item:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+
+        .stat-item:nth-child(3) {
+            animation-delay: 0.5s;
+        }
+
+        /* Updated stat number styling with new gradient */
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--neutral-700);
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            background: linear-gradient(180deg, var(--white) 0%, var(--neutral-50) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeInUp 0.8s ease-out 0.1s both;
+        }
+
+        /* Updated section header styling */
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--neutral-900);
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--neutral-700);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Enhanced feature cards with blue + orange theme */
+        .feature-card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--neutral-200);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: fadeInUp 0.8s ease-out both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .feature-card:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .feature-card:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .feature-card:nth-child(4) {
+            animation-delay: 0.5s;
+        }
+
+        .feature-card:nth-child(5) {
+            animation-delay: 0.6s;
+        }
+
+        .feature-card:nth-child(6) {
+            animation-delay: 0.7s;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+            box-shadow: 0 12px 40px rgba(249, 115, 22, 0.15);
+        }
+
+        /* Updated feature icon styling */
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.1), rgba(249, 115, 22, 0.1));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            color: var(--accent);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(-5deg);
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.15), rgba(249, 115, 22, 0.15));
+            border-color: var(--accent);
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            color: var(--neutral-900);
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card p {
+            color: var(--neutral-700);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            background:
+                radial-gradient(circle at top left, rgba(249, 115, 22, 0.16), transparent 32%),
+                radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.16), transparent 34%),
+                linear-gradient(135deg, #0f172a 0%, #172554 52%, #1e3a8a 100%);
+            color: var(--white);
+            padding: 4.5rem 2rem 2rem;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr));
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-brand {
+            max-width: 420px;
+        }
+
+        .footer-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            text-decoration: none;
+            color: var(--white);
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+        }
+
+        .footer-logo-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(249, 115, 22, 0.28);
+            font-weight: 800;
+        }
+
+        .footer-brand p {
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 0.98rem;
+            max-width: 34ch;
+        }
+
+        .footer-pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .footer-pill {
+            padding: 0.55rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: rgba(255, 255, 255, 0.88);
+            font-size: 0.84rem;
+            font-weight: 600;
+        }
+
+        .footer-column h4 {
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.68);
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .footer-links a,
+        .footer-links span {
+            color: rgba(255, 255, 255, 0.86);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--white);
+            transform: translateX(4px);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 2.5rem auto 0;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.14);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-bottom p,
+        .footer-bottom span {
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 0.9rem;
+        }
+
+        /* Icon animations */
+        @keyframes iconPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .feature-icon:hover {
+            animation: iconPulse 0.6s ease-in-out;
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-toggle {
+            display: none;
+            cursor: pointer;
+            z-index: 1001;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .mobile-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: flex;
+            }
+
+            header {
+                padding: 0.5rem 0;
+            }
+
+            nav {
+                padding: 0.8rem 1.5rem;
+            }
+
+            .logo img {
+                height: 80px !important;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 75%;
+                height: 100vh;
+                background: var(--white);
+                flex-direction: column;
+                justify-content: center;
+                gap: 2.5rem;
+                transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                box-shadow: -15px 0 35px rgba(0, 0, 0, 0.1);
+                padding: 2rem;
+                z-index: 1000;
+            }
+
+            .nav-active .nav-links {
+                right: 0;
+            }
+
+            .nav-links a {
+                font-size: 1.2rem;
+            }
+
+            .nav-buttons {
+                position: fixed;
+                bottom: 3rem;
+                right: -100%;
+                width: 75%;
+                padding: 0 2rem;
+                transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                z-index: 1001;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-active .nav-buttons {
+                right: 0;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 1rem;
+                text-align: center;
+            }
+
+            /* Hamburger Animation */
+            .nav-active .mobile-toggle span:nth-child(1) {
+                transform: translateY(9px) rotate(45deg);
+            }
+
+            .nav-active .mobile-toggle span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .nav-active .mobile-toggle span:nth-child(3) {
+                transform: translateY(-9px) rotate(-45deg);
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <header>
+        <nav>
+            <a href="#" class="logo">
+                <img src="{% static 'logo.png' %}" alt="SmallBiz Hub Logo" height="120">
+            </a>
+            <div class="mobile-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="{% url 'ologin' %}" class="btn btn-primary">Login as Owner</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Manage Your Business <span>Efficiently</span></h1>
+            <p>All-in-one business management platform designed for entrepreneurs and small teams to scale faster.</p>
+            <div class="hero-buttons">
+                <a href="{% url 'login' %}" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stat-item">
+            <div class="stat-number" data-target="{{ active_users }}">0</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" data-target="{{ total_businesses }}">0</div>
+            <div class="stat-label">Total Business Registered</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Support</div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2>Powerful Features</h2>
+            <p>Everything you need to grow your business in one place</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                </div>
+                <h3>Inventory Management</h3>
+                <p>Real-time stock tracking across multiple locations with automated reordering system.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </div>
+                <h3>Team Management</h3>
+                <p>Manage employees, track performance, schedule shifts, and streamline HR operations.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <path d="M2 10h20" />
+                        <circle cx="6" cy="16" r="1" />
+                        <circle cx="12" cy="16" r="1" />
+                    </svg>
+                </div>
+                <h3>Payment Processing</h3>
+                <p>Accept multiple payment methods with secure processing and instant settlement.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        <circle cx="9" cy="10" r="1" />
+                        <circle cx="12" cy="10" r="1" />
+                        <circle cx="15" cy="10" r="1" />
+                    </svg>
+                </div>
+                <h3>Customer Communications</h3>
+                <p>Send emails, SMS, and notifications to keep customers informed about updates.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 17" />
+                        <polyline points="17 6 23 6 23 12" />
+                    </svg>
+                </div>
+                <h3>Financial Reports</h3>
+                <p>Generate detailed reports on revenue, expenses, profit margins, and key metrics.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="M10 17l2 2 4-4" />
+                    </svg>
+                </div>
+                <h3>Security & Compliance</h3>
+                <p>Enterprise-grade security with encryption, compliance certifications, and backups.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="#" class="footer-logo">
+                    <span class="footer-logo-mark">S</span>
+                    <span>SmallBiz Hub</span>
+                </a>
+                <p>Built for ambitious local businesses that want clearer operations, smoother workflows, and room to grow without extra chaos.</p>
+                <div class="footer-pill-row">
+                    <span class="footer-pill">Business Management</span>
+                    <span class="footer-pill">Growth Ready</span>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <h4>Explore</h4>
+                <ul class="footer-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="{% url 'login' %}">User Login</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Access</h4>
+                <ul class="footer-links">
+                    <li><a href="{% url 'ologin' %}">Owner Portal</a></li>
+                    <li><span>Support Available 24/7</span></li>
+                    <li><span>Designed for Small Teams</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 SmallBiz Hub. All rights reserved.</p>
+            <span>Built to make daily business work feel lighter.</span>
+        </div>
+    </footer>
+
+    <script>
+        // Force scroll to top on page load interaction - Robust Version
+        if (history.scrollRestoration) {
+            history.scrollRestoration = 'manual';
+        }
+
+        // Scroll to top on unload to reset position for next load
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll to top immediately when DOM is ready
+        document.addEventListener("DOMContentLoaded", function () {
+            window.scrollTo(0, 0);
+        });
+
+        window.onload = function () {
+            window.scrollTo(0, 0);
+            // Extra insurance for some browsers that restore scroll late
+            setTimeout(function () {
+                window.scrollTo(0, 0);
+            }, 10);
+        }
+
+        // Counting Animation Script
+        const counters = document.querySelectorAll('.stat-number[data-target]');
+        const speed = 200; // The lower the slower
+
+        const animateCounters = () => {
+            counters.forEach(counter => {
+                const updateCount = () => {
+                    const target = +counter.getAttribute('data-target');
+                    const count = +counter.innerText;
+
+                    // Lower inc to slow and higher to slow
+                    const inc = target / speed;
+
+                    if (count < target) {
+                        // Add inc to count and output in counter
+                        counter.innerText = Math.ceil(count + inc);
+                        // Call function every ms
+                        setTimeout(updateCount, 20);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCount();
+            });
+        }
+
+        // Trigger animation when stats section is in view
+        let observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.5
+        };
+
+        let observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target); // Only animate once
+                }
+            });
+        }, observerOptions);
+
+        const statsSection = document.querySelector('.stats');
+        if (statsSection) {
+            observer.observe(statsSection);
+        }
+
+        // Mobile Menu Toggle Logic
+        const mobileMenu = document.getElementById('mobile-menu');
+        const nav = document.querySelector('nav');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        if (mobileMenu) {
+            mobileMenu.addEventListener('click', () => {
+                nav.classList.toggle('nav-active');
+            });
+        }
+
+        // Close menu when clicking links
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                nav.classList.remove('nav-active');
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (nav.classList.contains('nav-active') && !nav.contains(e.target)) {
+                nav.classList.remove('nav-active');
+            }
+        });
+    </script>
+</body>
+
+</html>

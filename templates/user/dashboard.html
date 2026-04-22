@@ -1,0 +1,2251 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="referrer" content="origin">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Small BiZ Hub - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #059669;
+            /* Green 600 */
+            --primary-light: #10b981;
+            /* Green 500 */
+            --primary-dark: #047857;
+            /* Green 700 */
+            --accent: #dc2626;
+            /* Red 600 */
+            --accent-light: #ef4444;
+            /* Red 500 */
+            --neutral-50: #f8fafc;
+            --neutral-100: #f1f5f9;
+            --neutral-200: #e2e8f0;
+            --neutral-800: #1e293b;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.8);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: var(--neutral-800);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient Background Elements */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 10% 20%, rgba(5, 150, 105, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(220, 38, 38, 0.08) 0%, transparent 40%);
+            z-index: -1;
+            pointer-events: none;
+            position: fixed;
+        }
+
+        /* Navbar */
+        .nav-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 1rem 0;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--neutral-800);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .welcome-text {
+            font-weight: 600;
+            color: var(--neutral-800);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .welcome-text i {
+            color: var(--primary);
+        }
+
+        .profile-dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--white);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .default-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border: 2px solid var(--white);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-transform: uppercase;
+        }
+
+        .profile-dropdown:hover .profile-img,
+        .profile-dropdown:hover .default-avatar {
+            transform: scale(1.1);
+            border-color: var(--primary-light);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: var(--white);
+            min-width: 200px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: dropdownSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid var(--neutral-200);
+        }
+
+        @keyframes dropdownSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-content a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            color: var(--neutral-800);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: var(--neutral-50);
+            color: var(--primary);
+            padding-left: 1.8rem;
+        }
+
+        .dropdown-content a i {
+            width: 20px;
+            text-align: center;
+            color: var(--text-light);
+            transition: color 0.2s ease;
+        }
+
+        .dropdown-content a:hover i {
+            color: var(--primary);
+        }
+
+        .logout-btn {
+            border-top: 1px solid var(--neutral-100);
+            color: var(--accent) !important;
+        }
+
+        .logout-btn:hover {
+            background: #fef2f2 !important;
+            color: #b91c1c !important;
+        }
+
+        .logout-btn i {
+            color: var(--accent-light) !important;
+        }
+
+        .logout-btn:hover i {
+            color: #b91c1c !important;
+        }
+
+        /* Mobile Menu */
+        .menu-icon {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--neutral-800);
+            cursor: pointer;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Search Section */
+        .search-section {
+            text-align: center;
+            margin: 3rem 0 4rem;
+            position: relative;
+        }
+
+        .search-section h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--neutral-800) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1.2rem 2rem 1.2rem 3.5rem;
+            border-radius: 50px;
+            border: 2px solid transparent;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            background: var(--white);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            /* Soft shadow */
+            transition: all 0.3s ease;
+            color: var(--neutral-800);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 15px 50px rgba(5, 150, 105, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-light);
+            font-size: 1.2rem;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus+.search-icon {
+            color: var(--primary);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .location-icon {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .location-icon:hover {
+            color: var(--primary-dark);
+            transform: translateY(-50%) scale(1.2);
+        }
+
+        .location-icon.loading {
+            animation: pulse 1.5s infinite;
+            color: var(--accent);
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Business Grid */
+        .business-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 2.5rem;
+            padding-bottom: 4rem;
+        }
+
+        .business-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: fadeInUp 0.6s ease-out both;
+        }
+
+        .business-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            background: var(--white);
+            border-color: var(--white);
+        }
+
+        /* Decorative top gradient border */
+        .business-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .business-card:hover::before {
+            opacity: 1;
+        }
+
+        .business-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .business-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--neutral-50);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .business-card:hover .business-icon {
+            background: var(--primary);
+            color: var(--white);
+            transform: rotate(-5deg) scale(1.1);
+        }
+
+        .business-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--neutral-800);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .business-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            background: #ecfdf5;
+            color: var(--primary-dark);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+        }
+
+        .business-details {
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.8rem;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .detail-item i {
+            color: var(--primary-light);
+            width: 20px;
+            text-align: center;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            border-top: 1px solid var(--neutral-100);
+            padding-top: 1.5rem;
+        }
+
+        .likes-count {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+            color: var(--neutral-800);
+        }
+
+        .likes-count i {
+            color: var(--accent);
+        }
+
+        .like-btn {
+            background: var(--neutral-50);
+            color: var(--neutral-800);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .like-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .like-btn.liked {
+            background: #fef2f2;
+            color: var(--accent);
+        }
+
+        .like-btn.not-liked:hover {
+            background: #f0fdf4;
+            color: var(--primary);
+        }
+
+        .like-btn i {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .like-btn:hover i {
+            transform: scale(1.2);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 2px dashed rgba(5, 150, 105, 0.2);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--primary-light);
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.8rem;
+            color: var(--neutral-800);
+            margin-bottom: 1rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: var(--white);
+            margin: 5% auto;
+            padding: 3rem;
+            border-radius: 30px;
+            width: 90%;
+            max-width: 550px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            color: var(--text-light);
+            font-size: 2rem;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: var(--accent);
+            transform: rotate(90deg);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 2rem;
+            color: var(--neutral-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-header p {
+            color: var(--text-light);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--neutral-800);
+            margin-left: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: var(--neutral-100);
+            border: 2px solid transparent;
+            border-radius: 50px;
+            font-size: 1rem;
+            color: var(--neutral-800);
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            background: var(--white);
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.1);
+        }
+
+        .form-control[readonly] {
+            background-color: #f1f5f9;
+            color: #94a3b8;
+            cursor: not-allowed;
+            border-color: #e2e8f0;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(5, 150, 105, 0.25);
+            margin-top: 1rem;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(5, 150, 105, 0.35);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .stagger-delay-2 {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-delay-3 {
+            animation-delay: 0.3s;
+        }
+
+        /* Updated Mobile Menu / Sidebar Styles */
+        .mobile-only {
+            display: none;
+        }
+
+        .mobile-icon {
+            display: none;
+            width: 25px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 900px) {
+            .navbar {
+                padding: 0 1.5rem;
+            }
+
+            .search-section h1 {
+                font-size: 2.2rem;
+            }
+
+            .business-card {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .business-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                /* Slightly increased gap */
+                padding-bottom: 6rem;
+                /* Extra space for bottom nav if needed */
+            }
+
+            .business-card {
+                padding: 1rem;
+                border-radius: 16px;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                /* Ensure cards match height in row */
+                min-height: 260px;
+                /* Minimum height for consistency */
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                /* Softer shadow */
+            }
+
+            /* Header compaction */
+            .business-header {
+                margin-bottom: 0.8rem;
+                align-items: center;
+                /* Center align items */
+                gap: 8px;
+            }
+
+            .business-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+                border-radius: 10px;
+                margin-bottom: 0;
+                /* Remove bottom margin */
+            }
+
+            .business-badge {
+                padding: 0.25rem 0.6rem;
+                font-size: 0.65rem;
+                margin-bottom: 0;
+                /* Remove bottom margin */
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100px;
+                /* Prevent badge from breaking layout */
+                display: none;
+                /* Hide Badge on mobile to save space? Or keep small? Let's keep small */
+            }
+
+            /* Text Truncation */
+            .business-name {
+                font-size: 1rem;
+                line-height: 1.3;
+                margin-bottom: 0.5rem;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                /* Limit to 2 lines */
+                line-clamp: 2;
+                /* Standard property */
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                height: 2.6em;
+                /* Fixed height ~2 lines */
+            }
+
+            .business-details {
+                margin-bottom: 0.8rem;
+                flex-grow: 1;
+                /* Push footer down */
+            }
+
+            .detail-item {
+                font-size: 0.75rem;
+                margin-bottom: 0.4rem;
+                align-items: flex-start;
+                /* Align icon to top of text */
+                line-height: 1.4;
+            }
+
+            .detail-item span {
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                /* Limit address lines */
+                line-clamp: 3;
+                /* Standard property */
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .detail-item i {
+                width: 14px;
+                margin-top: 2px;
+                /* Visual alignment */
+            }
+
+            /* Compact Footer */
+            .card-footer {
+                padding-top: 0.8rem;
+                flex-direction: row;
+                /* Back to row for compact feel? Or column? Row is better if items are small */
+                justify-content: space-between;
+                gap: 5px;
+                align-items: center;
+                border: none;
+                /* Remove border for cleaner look */
+            }
+
+            .likes-count {
+                font-size: 0.8rem;
+                background: var(--neutral-50);
+                padding: 4px 8px;
+                border-radius: 12px;
+            }
+
+            .like-btn {
+                width: auto;
+                /* Auto width */
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+                border-radius: 12px;
+            }
+
+            /* Hide text in like button on mobile to save space, just icon */
+        }
+
+        @media (max-width: 768px) {
+            .mobile-only {
+                display: block;
+            }
+
+            .mobile-only.logout-link {
+                color: var(--accent) !important;
+                margin-top: auto;
+                border-top: 1px solid var(--neutral-200);
+                padding-top: 1.5rem;
+            }
+
+            .desktop-only {
+                display: none !important;
+            }
+
+            .mobile-icon {
+                display: inline-block;
+            }
+
+            .nav-links {
+                display: none;
+                /* Instant hide when closed */
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 280px;
+                height: 100vh;
+                background: var(--white);
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0;
+                box-shadow: -5px 0 30px rgba(0, 0, 0, 0.15);
+                z-index: 1000;
+                overflow-y: auto;
+            }
+
+            .nav-links.active {
+                display: flex;
+                animation: sidebarSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+
+            @keyframes sidebarSlideIn {
+                from {
+                    transform: translateX(100%);
+                }
+
+                to {
+                    transform: translateX(0);
+                }
+            }
+
+
+            .nav-links a {
+                padding: 1rem 2rem;
+                font-size: 1.1rem;
+                border-bottom: 1px solid var(--neutral-100);
+                width: 100%;
+                color: var(--neutral-800);
+            }
+
+            .nav-links a:hover {
+                background-color: var(--neutral-50);
+                padding-left: 2.5rem;
+            }
+
+            .nav-links a::after {
+                display: none;
+                /* Remove underline effect on mobile */
+            }
+
+            /* Sidebar Header Styles */
+            .sidebar-header {
+                background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+                padding: 2rem;
+                height: 200px;
+                /* Fixed height for cover effect */
+                color: var(--white);
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                /* Align text to bottom */
+                align-items: flex-start;
+                position: relative;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                overflow: hidden;
+            }
+
+            /* Overlay to ensure text readability */
+            .sidebar-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.8));
+                z-index: 1;
+            }
+
+            .close-btn {
+                position: absolute;
+                top: 1.5rem;
+                right: 1.5rem;
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 1.5rem;
+                cursor: pointer;
+                transition: transform 0.3s ease;
+                z-index: 2;
+                /* Above overlay */
+            }
+
+            .close-btn:hover {
+                color: var(--white);
+                transform: rotate(90deg);
+            }
+
+            /* Removed .sidebar-profile-img since it's now a background */
+
+            .sidebar-default-avatar {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.2);
+                border: 3px solid rgba(255, 255, 255, 0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--white);
+                margin-bottom: 1rem;
+                z-index: 2;
+            }
+
+            .sidebar-user-info {
+                position: relative;
+                z-index: 2;
+                /* Above overlay */
+                width: 100%;
+            }
+
+            .sidebar-user-info h3 {
+                font-size: 1.8rem;
+                margin-bottom: 0.2rem;
+                font-weight: 700;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .sidebar-user-info p {
+                font-size: 1rem;
+                opacity: 0.9;
+                font-weight: 500;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            }
+
+            .menu-icon {
+                display: block;
+            }
+
+            .search-section {
+                margin: 2rem 0;
+            }
+
+            .search-section h1 {
+                font-size: 1.8rem;
+            }
+
+            .search-input {
+                padding: 1rem 3.5rem 1rem 2.8rem;
+                font-size: 0.95rem;
+            }
+
+            .search-input::placeholder {
+                font-size: 0.85rem;
+            }
+
+            .search-icon {
+                left: 1.2rem;
+                font-size: 1rem;
+            }
+
+            .location-icon {
+                right: 1.2rem;
+                font-size: 1.1rem;
+            }
+
+
+            .container {
+                padding: 1rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 2rem;
+            }
+        }
+
+        /* ── Floating Map Button ── */
+        .map-float-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(37,99,235,0.45);
+            transition: all 0.3s ease;
+            z-index: 998;
+            cursor: pointer;
+            border: none;
+        }
+        .map-float-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(37,99,235,0.55);
+        }
+        .map-float-btn i {
+            font-size: 1.4rem;
+            color: #fff;
+        }
+        .map-float-btn::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            animation: mapBtnPulse 2.5s infinite;
+            z-index: -1;
+        }
+        @keyframes mapBtnPulse {
+            0%   { transform: scale(1); opacity: 0.7; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+        .map-float-label {
+            position: absolute;
+            right: 70px;
+            background: #1d4ed8;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .map-float-btn:hover .map-float-label {
+            opacity: 1;
+        }
+
+        /* ── Full-Screen Map Overlay ── */
+        #mapOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(15,23,42,0.65);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            animation: fadeIn 0.25s ease;
+        }
+        #mapOverlay.open { display: flex; flex-direction: column; }
+        .map-overlay-panel {
+            background: #fff;
+            border-radius: 24px 24px 0 0;
+            height: 92vh;
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: overlaySlideUp 0.35s cubic-bezier(0.16,1,0.3,1);
+            box-shadow: 0 -10px 60px rgba(0,0,0,0.2);
+        }
+        @keyframes overlaySlideUp {
+            from { transform: translateY(60px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+        .map-overlay-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            flex-shrink: 0;
+        }
+        .map-overlay-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+        .map-overlay-title i { color: #60a5fa; font-size: 1.1rem; }
+        .map-overlay-title span.biz-count {
+            background: rgba(96,165,250,0.18);
+            border: 1px solid rgba(96,165,250,0.35);
+            color: #93c5fd;
+            font-size: 0.78rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .map-overlay-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        #nearMeBtn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 0.5rem 1.1rem;
+            background: linear-gradient(135deg, #059669, #047857);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(5,150,105,0.3);
+            transition: all 0.3s ease;
+        }
+        #nearMeBtn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(5,150,105,0.4); }
+        #nearMeBtn.loading { opacity: 0.7; pointer-events: none; }
+        .map-close-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #cbd5e1;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .map-close-btn:hover { background: rgba(239,68,68,0.2); color: #f87171; }
+        #businessMap {
+            flex: 1;
+            width: 100%;
+        }
+        /* Leaflet popup overrides */
+        .leaflet-popup-content-wrapper {
+            border-radius: 16px !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.18) !important;
+            border: none !important;
+            padding: 0 !important;
+            overflow: hidden;
+        }
+        .leaflet-popup-content {
+            margin: 0 !important;
+            width: 240px !important;
+        }
+        .leaflet-popup-tip-container { margin-top: -1px; }
+        .map-popup { font-family: 'Outfit', sans-serif; }
+        .map-popup-header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 12px 14px 10px;
+            color: #fff;
+        }
+        .map-popup-header .popup-type-badge {
+            display: inline-block;
+            background: rgba(96,165,250,0.2);
+            border: 1px solid rgba(96,165,250,0.35);
+            color: #93c5fd;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .map-popup-header h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin: 0 0 2px;
+            line-height: 1.3;
+            color: #fff;
+        }
+        .map-popup-header small {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+        .map-popup-body {
+            padding: 10px 14px 12px;
+            background: #fff;
+        }
+        .map-popup-name-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: #475569;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .map-popup-name-row i { color: var(--primary-light); font-size: 0.75rem; flex-shrink: 0; }
+        .map-popup-addr {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 5px;
+            line-height: 1.4;
+        }
+        .map-popup-addr i { color: #cbd5e1; margin-top: 2px; flex-shrink: 0; font-size: 0.7rem; }
+        .popup-btn-row {
+            display: flex;
+            gap: 6px;
+        }
+        .popup-view-btn {
+            flex: 1;
+            padding: 7px 6px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.78rem;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .popup-view-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .popup-directions-btn {
+            flex: 1;
+            padding: 7px 6px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.78rem;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .popup-directions-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+        @media (max-width: 768px) {
+            .map-float-btn { bottom: 90px; right: 20px; width: 54px; height: 54px; }
+            .map-overlay-panel { height: 95vh; border-radius: 20px 20px 0 0; }
+            .leaflet-popup-content { width: 210px !important; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <div class="nav-container">
+        <nav class="navbar">
+            <a href="{% url 'dashboard' %}" class="nav-brand">SmALl BiZ hub</a>
+
+            <div class="nav-links" id="navLinks">
+                <!-- Sidebar Header (Mobile Only) -->
+                <div class="sidebar-header mobile-only" {% if user.profile %}
+                    style="background-image: url('{{ user.profile.url }}');" {% elif user.google_profile_image %}
+                    style="background-image: url('{{ user.google_profile_image }}');" {% endif %}>
+
+                    <div class="close-btn" onclick="toggleMenu()">
+                        <i class="fas fa-times"></i>
+                    </div>
+
+                    <!-- Only show default avatar if no image is available for background -->
+                    {% if not user.profile and not user.google_profile_image %}
+                    <div class="sidebar-default-avatar">
+                        {{ username|first }}
+                    </div>
+                    {% endif %}
+
+                    <div class="sidebar-user-info">
+                        <h3>{{ username }}</h3>
+                        <p>User</p>
+                    </div>
+                </div>
+
+                <a href="{% url 'dashboard' %}"><i class="fas fa-home mobile-icon"></i> Home</a>
+                <a href="#"><i class="fas fa-info-circle mobile-icon"></i> About Us</a>
+                <a href="{% url 'saved_businesses' %}"><i class="fas fa-bookmark mobile-icon"></i> Saved Business</a>
+                <a href="{% url 'contact' %}"><i class="fas fa-envelope mobile-icon"></i> Contact</a>
+
+                <!-- Mobile Only Profile Links -->
+                <a href="#" onclick="showUpdateProfileForm(); toggleMenu()" class="mobile-only">
+                    <i class="fas fa-user-edit mobile-icon"></i> Update Profile
+                </a>
+                <a href="{% url 'logout' %}" class="mobile-only logout-link">
+                    <i class="fas fa-sign-out-alt mobile-icon"></i> Logout
+                </a>
+
+                <!-- Desktop Only Profile Dropdown -->
+                <div class="profile-dropdown desktop-only">
+                    <div id="profile-preview-wrapper">
+                        {% if user.profile %}
+                        <img src="{{ user.profile.url }}" alt="Profile" class="profile-img"
+                            onclick="toggleProfileDropdown()">
+                        {% elif user.google_profile_image %}
+                        <img src="{{ user.google_profile_image }}" alt="Profile" class="profile-img"
+                            onclick="toggleProfileDropdown()">
+                        {% else %}
+                        <div class="default-avatar" onclick="toggleProfileDropdown()">
+                            {{ username|first }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="dropdown-content" id="profileDropdown">
+                        <div
+                            style="padding: 1rem 1.5rem; background: var(--neutral-50); border-bottom: 1px solid var(--neutral-200);">
+                            <div style="font-weight: 700; color: var(--neutral-800);">{{ username }}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-light);">User</div>
+                        </div>
+                        <a href="#" onclick="showUpdateProfileForm()">
+                            <i class="fas fa-user-edit"></i> Update Profile
+                        </a>
+                        <a href="{% url 'logout' %}" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="user-section">
+                <!-- Mobile Menu Toggle -->
+                <div class="menu-icon" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                </div>
+
+
+            </div>
+        </nav>
+    </div>
+
+    <div class="container">
+        <!-- Search Section -->
+        <div class="search-section">
+            <h1>Discover Local Businesses</h1>
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" class="search-input"
+                    placeholder="Search by shop name, type, or address..." autocomplete="off">
+                <i class="fas fa-search search-icon"></i>
+                <i class="fas fa-map-marker-alt location-icon" onclick="sortByLocation()" title="Sort by nearest"></i>
+            </div>
+        </div>
+
+
+
+        <!-- Business Grid -->
+        <div class="business-grid" id="businessGrid">
+            {% for business in businesses %}
+            <div class="business-card stagger-delay-{{ forloop.counter|divisibleby:3 }}"
+                data-shop="{{ business.shop|lower }}" data-type="{{ business.business_type|lower }}"
+                data-address="{{ business.business_address|lower }}" data-lat="{{ business.latitude|default:'' }}"
+                data-long="{{ business.longitude|default:'' }}" data-url="{% url 'business_detail' business.id %}"
+                onclick="window.location.href=this.dataset.url;">
+
+                <div class="business-header" style="flex-wrap: wrap; gap: 8px;">
+                    <div class="business-icon" style="margin-bottom: 0;">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="badges-container" style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-left: auto; justify-content: flex-end; flex: 1;">
+                        <span class="business-badge" style="margin-bottom: 0;">{{ business.business_type }}</span>
+                        {% if business.is_trending %}
+                        <span class="trending-seal" style="display: inline-flex; align-items: center; background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3); text-transform: uppercase;">
+                            <i class="fas fa-fire" style="margin-right: 4px;"></i> Trending
+                        </span>
+                        {% endif %}
+                        <div class="rating-badge" style="display: inline-flex; align-items: center; background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.05)); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.4); box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);">
+                            <i class="fas fa-star" style="color: #f59e0b; margin-right: 5px; font-size: 0.95rem;"></i>
+                            <span style="color: #b45309; font-weight: 800; font-size: 0.95rem;">{{ business.average_rating }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="business-name">{{ business.shop }}</h3>
+
+                <div class="business-details">
+                    <!-- Shop detail removed as it's now the header -->
+                    <div class="detail-item">
+                        <i class="fas fa-location-arrow"></i>
+                        <span>{{ business.business_address }}</span>
+                    </div>
+                    <div class="detail-item distance-info" style="display: none; color: var(--primary);">
+                        <i class="fas fa-route"></i>
+                        <span class="distance-text">Calculating...</span>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="likes-count">
+                        <i class="fas fa-heart"></i>
+                        <span id="likes-count-{{ business.id }}">{{ business.total_likes }}</span>
+                    </div>
+                    <!-- removed div -->
+
+                    <button class="like-btn {% if business.is_liked %}liked{% else %}not-liked{% endif %}"
+                        data-business="{{ business.id }}"
+                        onclick="event.stopPropagation(); toggleLike(this, '{{ business.id }}')">
+                        {% if business.is_liked %}
+                        <i class="fas fa-heart"></i> Liked
+                        {% else %}
+                        <i class="far fa-heart"></i> Like
+                        {% endif %}
+                    </button>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <i class="fas fa-store-slash"></i>
+                <h3>No businesses found yet.</h3>
+                <p>Be the first to explore and add businesses to our hub!</p>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    
+
+    <!-- Profile Update Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeProfileModal()">&times;</span>
+            <div class="modal-header">
+                <h2>Update Profile</h2>
+                <p>Manage your account settings</p>
+            </div>
+
+            <form id="updateProfileForm" method="post" action="{% url 'update_profile' %}"
+                enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" value="{{ user.username }}">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" value="{{ profile_email }}">
+                </div>
+                <div class="form-group">
+                    <label for="phone_number">
+                        Phone Number
+                        {% if user.phone_verified %}
+                        <span id="userPhoneVerifiedBadge"
+                            style="display: inline-flex; align-items: center; gap: 0.35rem; margin-left: 0.5rem; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; background: rgba(16, 185, 129, 0.1); color: #059669;">
+                            <i class="fas fa-check-circle"></i> Verified
+                        </span>
+                        {% else %}
+                        <span id="userPhoneVerifiedBadge"
+                            style="display: inline-flex; align-items: center; gap: 0.35rem; margin-left: 0.5rem; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; background: rgba(245, 158, 11, 0.12); color: #b45309;">
+                            <i class="fas fa-clock"></i> Unverified
+                        </span>
+                        {% endif %}
+                    </label>
+                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="phone_number" name="phone_number" class="form-control"
+                            value="{{ user.phone_number|default:'' }}" style="flex: 1;">
+                        <button type="button" id="verifyUserPhoneBtn"
+                            style="display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.85rem 1.15rem; border-radius: 14px; border: 1px solid var(--neutral-200); background: var(--white); color: var(--neutral-800); font-weight: 600; cursor: pointer;">
+                            Verify
+                        </button>
+                    </div>
+                    <span id="userPhoneProfileData" style="display:none;"
+                        data-verified="{% if user.phone_verified %}true{% else %}false{% endif %}"
+                        data-original-phone="{{ user.phone_number|default:'' }}"></span>
+                    <p id="userPhoneStatusMessage"
+                        style="margin-top: 0.5rem; font-size: 0.9rem; color: {% if user.phone_verified %}#059669{% else %}#b45309{% endif %};">
+                        {% if user.phone_verified %}
+                        Your current phone number is verified.
+                        {% elif user.phone_number %}
+                        Please verify this phone number before saving changes.
+                        {% else %}
+                        Add a phone number and verify it before saving.
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="form-group">
+                    <label for="profile_picture">Profile Picture</label>
+
+                    {% if user.profile %}
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <img src="{{ user.profile.url }}" alt="Current Profile"
+                            style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--neutral-200);">
+                        <button type="button" onclick="deleteProfilePicture()" class="btn-delete"
+                            style="background: #fee2e2; color: #b91c1c; border: none; padding: 0.5rem 1rem; border-radius: 50px; cursor: pointer; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 5px; transition: all 0.2s ease;">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </button>
+                    </div>
+                    {% endif %}
+
+                    <input type="file" id="profile_picture" name="profile_picture" class="form-control"
+                        style="padding: 0.7rem 1.5rem;">
+                </div>
+                <button type="submit" id="saveProfileBtn" class="btn-submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="userPhoneOtpModal" class="modal">
+        <div class="modal-content" style="max-width: 420px;">
+            <span class="close" onclick="closeUserPhoneOtpModal()">&times;</span>
+            <div class="modal-header">
+                <h2>Phone Verification</h2>
+                <p>Enter the 6-digit OTP shown below</p>
+            </div>
+            <div id="userPhoneOtpValue"
+                style="background: #ecfdf5; color: #047857; padding: 1rem; border-radius: 14px; text-align: center; font-size: 1.8rem; font-weight: 700; letter-spacing: 0.35rem; margin-bottom: 1rem;">
+                123456
+            </div>
+            <input type="text" id="userPhoneOtpInput" class="form-control" maxlength="6" placeholder="000000"
+                style="text-align: center; font-size: 1.25rem; letter-spacing: 0.25rem; margin-bottom: 1rem;">
+            <button type="button" id="confirmUserPhoneOtpBtn" class="btn-submit" style="width: 100%;">Confirm Verification</button>
+        </div>
+    </div>
+
+    <script>
+        // Toggle Mobile Menu
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // Toggle Profile Dropdown
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function (event) {
+            if (!event.target.matches('.profile-img') && !event.target.matches('.default-avatar')) {
+                const dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+
+            // Close modal if clicked outside
+            const modal = document.getElementById('profileModal');
+            if (event.target == modal) {
+                closeProfileModal();
+            }
+
+            const userPhoneOtpModal = document.getElementById('userPhoneOtpModal');
+            if (event.target == userPhoneOtpModal) {
+                closeUserPhoneOtpModal();
+            }
+        }
+
+        // Profile Modal Functions
+        function showUpdateProfileForm() {
+            document.getElementById('profileModal').style.display = "block";
+            // Close dropdown
+            document.getElementById('profileDropdown').classList.remove('show');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').style.display = "none";
+        }
+
+        const userPhoneInput = document.getElementById('phone_number');
+        const verifyUserPhoneBtn = document.getElementById('verifyUserPhoneBtn');
+        const saveProfileBtn = document.getElementById('saveProfileBtn');
+        const userPhoneOtpModal = document.getElementById('userPhoneOtpModal');
+        const userPhoneOtpValue = document.getElementById('userPhoneOtpValue');
+        const userPhoneOtpInput = document.getElementById('userPhoneOtpInput');
+        const confirmUserPhoneOtpBtn = document.getElementById('confirmUserPhoneOtpBtn');
+        const userPhoneVerifiedBadge = document.getElementById('userPhoneVerifiedBadge');
+        const userPhoneStatusMessage = document.getElementById('userPhoneStatusMessage');
+        const userPhoneProfileData = document.getElementById('userPhoneProfileData');
+
+        let originalUserPhone = userPhoneProfileData.dataset.originalPhone;
+        let isUserPhoneVerified = userPhoneProfileData.dataset.verified === 'true';
+
+        function updateUserPhoneBadge(verified) {
+            if (verified) {
+                userPhoneVerifiedBadge.style.background = 'rgba(16, 185, 129, 0.1)';
+                userPhoneVerifiedBadge.style.color = '#059669';
+                userPhoneVerifiedBadge.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
+            } else {
+                userPhoneVerifiedBadge.style.background = 'rgba(245, 158, 11, 0.12)';
+                userPhoneVerifiedBadge.style.color = '#b45309';
+                userPhoneVerifiedBadge.innerHTML = '<i class="fas fa-clock"></i> Unverified';
+            }
+        }
+
+        function syncUserPhoneState() {
+            const currentPhone = userPhoneInput.value.trim();
+
+            if (!currentPhone) {
+                saveProfileBtn.disabled = false;
+                verifyUserPhoneBtn.style.display = 'none';
+                updateUserPhoneBadge(false);
+                userPhoneStatusMessage.textContent = 'Add a phone number and verify it before saving.';
+                userPhoneStatusMessage.style.color = '#64748b';
+                return;
+            }
+
+            if (currentPhone === originalUserPhone && isUserPhoneVerified) {
+                saveProfileBtn.disabled = false;
+                verifyUserPhoneBtn.style.display = 'none';
+                updateUserPhoneBadge(true);
+                userPhoneStatusMessage.textContent = 'Your current phone number is verified.';
+                userPhoneStatusMessage.style.color = '#059669';
+                return;
+            }
+
+            saveProfileBtn.disabled = true;
+            verifyUserPhoneBtn.style.display = 'inline-flex';
+            updateUserPhoneBadge(false);
+            userPhoneStatusMessage.textContent = 'Please verify this phone number before saving changes.';
+            userPhoneStatusMessage.style.color = '#b45309';
+        }
+
+        function closeUserPhoneOtpModal() {
+            userPhoneOtpModal.style.display = 'none';
+        }
+
+        userPhoneInput.addEventListener('input', syncUserPhoneState);
+        syncUserPhoneState();
+
+        verifyUserPhoneBtn.addEventListener('click', async function () {
+            const phone = userPhoneInput.value.trim();
+            if (!phone || phone.length < 10) {
+                alert('Please enter a valid phone number.');
+                return;
+            }
+
+            verifyUserPhoneBtn.disabled = true;
+            verifyUserPhoneBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+            const formData = new FormData();
+            formData.append('phone_number', phone);
+
+            try {
+                const response = await fetch("{% url 'generate_user_phone_otp' %}", {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    userPhoneOtpValue.textContent = data.otp;
+                    userPhoneOtpInput.value = '';
+                    userPhoneOtpModal.style.display = 'block';
+                } else {
+                    alert(data.message || 'Failed to send OTP.');
+                }
+            } catch (error) {
+                alert('Connection error. Please try again.');
+            } finally {
+                verifyUserPhoneBtn.disabled = false;
+                verifyUserPhoneBtn.innerHTML = 'Verify';
+            }
+        });
+
+        confirmUserPhoneOtpBtn.addEventListener('click', async function () {
+            const otp = userPhoneOtpInput.value.trim();
+            if (otp.length !== 6) {
+                alert('Enter the 6-digit OTP.');
+                return;
+            }
+
+            confirmUserPhoneOtpBtn.disabled = true;
+            confirmUserPhoneOtpBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+
+            const formData = new FormData();
+            formData.append('otp', otp);
+
+            try {
+                const response = await fetch("{% url 'verify_user_phone_otp' %}", {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    closeUserPhoneOtpModal();
+                    isUserPhoneVerified = true;
+                    originalUserPhone = userPhoneInput.value.trim();
+                    updateUserPhoneBadge(true);
+                    userPhoneStatusMessage.textContent = 'Phone number verified successfully. You can save now.';
+                    userPhoneStatusMessage.style.color = '#059669';
+                    saveProfileBtn.disabled = false;
+                    verifyUserPhoneBtn.style.display = 'none';
+                } else {
+                    alert(data.message || 'Invalid OTP.');
+                }
+            } catch (error) {
+                alert('Verification failed. Please try again.');
+            } finally {
+                confirmUserPhoneOtpBtn.disabled = false;
+                confirmUserPhoneOtpBtn.textContent = 'Confirm Verification';
+            }
+        });
+
+        // Search Functionality
+        document.getElementById('searchInput').addEventListener('keyup', function () {
+            const query = this.value.toLowerCase();
+            const cards = document.querySelectorAll('.business-card');
+            let hasVisible = false;
+
+            cards.forEach(card => {
+                const shop = card.getAttribute('data-shop');
+                const type = card.getAttribute('data-type');
+                const address = card.getAttribute('data-address');
+
+                if (shop.includes(query) || type.includes(query) || address.includes(query)) {
+                    card.style.display = "flex";
+                    // Reset animation
+                    card.style.animation = 'none';
+                    card.offsetHeight; /* trigger reflow */
+                    card.style.animation = 'fadeInUp 0.6s ease-out both';
+                    hasVisible = true;
+                } else {
+                    card.style.display = "none";
+                }
+            });
+
+            // Show empty state if no results (optional logic improvement)
+        });
+
+        // Location Search Functionality
+        function sortByLocation() {
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser.");
+                return;
+            }
+
+            const btn = document.querySelector('.location-icon');
+            btn.classList.add('loading');
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLat = position.coords.latitude;
+                    const userLong = position.coords.longitude;
+                    const container = document.getElementById('businessGrid');
+                    const cards = Array.from(container.getElementsByClassName('business-card'));
+
+                    // Calculate distances and update UI first
+                    cards.forEach(card => {
+                        const lat = parseFloat(card.dataset.lat);
+                        const long = parseFloat(card.dataset.long);
+
+                        if (!isNaN(lat) && !isNaN(long)) {
+                            const dist = getDistanceFromLatLonInKm(userLat, userLong, lat, long);
+                            card.dataset.distance = dist; // Store for sorting
+
+                            // Update display
+                            const distInfo = card.querySelector('.distance-info');
+                            const distText = card.querySelector('.distance-text');
+                            if (distInfo && distText) {
+                                distText.innerText = dist.toFixed(1) + " km away";
+                                distInfo.style.display = "flex";
+                            }
+                        } else {
+                            card.dataset.distance = 999999; // Far away default
+                        }
+                    });
+
+                    // Sort based on calculated distance
+                    cards.sort((a, b) => {
+                        return parseFloat(a.dataset.distance) - parseFloat(b.dataset.distance);
+                    });
+
+                    // Re-append in new order
+                    cards.forEach(card => card.style.animation = 'none');
+                    cards.forEach(card => container.appendChild(card));
+
+                    // Optional: Trigger a reflow or small animation to show update
+                    setTimeout(() => {
+                        cards.forEach((card, index) => {
+                            card.style.animation = `fadeInUp 0.6s ease-out ${index * 0.1}s both`;
+                        });
+                    }, 10);
+
+                    btn.classList.remove('loading');
+                    document.getElementById('searchInput').placeholder = "Sorted by nearest location";
+                },
+                (error) => {
+                    btn.classList.remove('loading');
+                    let msg = "Unable to retrieve your location.";
+                    if (error.code === 1) msg = "Location permission denied.";
+                    alert(msg);
+                }
+            );
+        }
+
+        // Haversine formula to calculate distance
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            var R = 6371;
+            var dLat = deg2rad(lat2 - lat1);
+            var dLon = deg2rad(lon2 - lon1);
+            var a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = R * c;
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180)
+        }
+
+        // Profile Picture Preview
+        document.getElementById('profile_picture').addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var container = document.getElementById('profile-preview-wrapper');
+                    container.innerHTML = `<img src="${e.target.result}" alt="Profile" class="profile-img" onclick="toggleProfileDropdown()">`;
+                }
+
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        // Like Button Functionality (AJAX)
+        function toggleLike(btn, businessId) {
+            fetch(`/users/like/${businessId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.liked) {
+                        btn.classList.add('liked');
+                        btn.classList.remove('not-liked');
+                        btn.innerHTML = '<i class="fas fa-heart"></i> Liked';
+                    } else {
+                        btn.classList.remove('liked');
+                        btn.classList.add('not-liked');
+                        btn.innerHTML = '<i class="far fa-heart"></i> Like';
+                    }
+                    document.getElementById(`likes-count-${businessId}`).innerText = data.total_likes;
+                    btn.closest('.card-footer').querySelector('.likes-count span').innerText = data.total_likes;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (btn.classList.contains('liked')) {
+                        btn.classList.remove('liked');
+                        btn.classList.add('not-liked');
+                        btn.innerHTML = '<i class="far fa-heart"></i> Like';
+                    } else {
+                        btn.classList.add('liked');
+                        btn.classList.remove('not-liked');
+                        btn.innerHTML = '<i class="fas fa-heart"></i> Liked';
+                    }
+                });
+        }
+
+        function deleteProfilePicture() {
+            if (confirm('Are you sure you want to delete your profile picture? This action cannot be undone.')) {
+                fetch('{% url "delete_profile_picture" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('Failed to delete profile picture: ' + (data.error || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while deleting the profile picture.');
+                    });
+            }
+        }
+
+        </script>
+
+    <!-- Leaflet.js Script -->
+    <!-- Business map data as a JSON island (linter-safe) -->
+    <script id="businessMapDataJson" type="application/json">[
+        {% for b in businesses %}{% if b.latitude and b.longitude %}
+        {"id": {{ b.id }}, "name": "{{ b.name|escapejs }}", "shop": "{{ b.shop|escapejs }}", "type": "{{ b.business_type|escapejs }}", "address": "{{ b.business_address|escapejs }}", "lat": {{ b.latitude }}, "lng": {{ b.longitude }}, "url": "{% url 'business_detail' b.id %}"},
+        {% endif %}{% endfor %}
+        null
+    ]</script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+    <script>
+        /* ── Leaflet Map Initialisation ── */
+        let mapInstance = null;
+        let userMarker  = null;
+
+        // Business data is stored in the JSON island below and read at init time
+        let businessMapData = [];
+        try {
+            businessMapData = JSON.parse(
+                document.getElementById('businessMapDataJson').textContent
+            ).filter(Boolean);  // remove the trailing null sentinel
+        } catch(e) { console.error('Map data parse error', e); }
+
+        document.getElementById('mapBizCount').textContent = businessMapData.length;
+
+        function initMap() {
+            if (mapInstance) {
+                setTimeout(() => mapInstance.invalidateSize(), 50);
+                return;
+            }
+
+            mapInstance = L.map('businessMap', { zoomControl: true }).setView([20.5937, 78.9629], 5);
+
+            // Tile layer — OpenStreetMap (no API key needed)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                maxZoom: 19
+            }).addTo(mapInstance);
+
+            // Custom green pin icon
+            const bizIcon = L.divIcon({
+                className: '',
+                html: `<div style="
+                    width:36px;height:36px;
+                    background:linear-gradient(135deg,#059669,#047857);
+                    border-radius:50% 50% 50% 0;
+                    transform:rotate(-45deg);
+                    box-shadow:0 4px 12px rgba(5,150,105,0.45);
+                    border:3px solid #fff;
+                    display:flex;align-items:center;justify-content:center;
+                "><span style="transform:rotate(45deg);color:#fff;font-size:14px;">&#xf54e;</span></div>`,
+                iconSize:   [36, 36],
+                iconAnchor: [18, 36],
+                popupAnchor:[0, -38]
+            });
+
+            if (businessMapData.length === 0) {
+                mapInstance.setView([20.5937, 78.9629], 5);
+            } else {
+                const bounds = [];
+                businessMapData.forEach(biz => {
+                    const marker = L.marker([biz.lat, biz.lng], { icon: bizIcon }).addTo(mapInstance);
+                    const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${biz.lat},${biz.lng}`;
+                    const popupHtml = `
+                        <div class="map-popup">
+                            <div class="map-popup-header">
+                                <span class="popup-type-badge">${biz.type}</span>
+                                <h4>${biz.shop}</h4>
+                                <small><i class="fas fa-user" style="margin-right:4px"></i>${biz.name}</small>
+                            </div>
+                            <div class="map-popup-body">
+                                <div class="map-popup-addr">
+                                    <i class="fas fa-location-dot"></i>
+                                    <span>${biz.address}</span>
+                                </div>
+                                <div class="popup-btn-row">
+                                    <a href="${biz.url}" class="popup-view-btn">
+                                        <i class="fas fa-store"></i> Details
+                                    </a>
+                                    <a href="${directionsUrl}" target="_blank" rel="noopener" class="popup-directions-btn">
+                                        <i class="fas fa-diamond-turn-right"></i> Directions
+                                    </a>
+                                </div>
+                            </div>
+                        </div>`;
+                    marker.bindPopup(popupHtml, { maxWidth: 260, minWidth: 240 });
+                    bounds.push([biz.lat, biz.lng]);
+                });
+                mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 });
+            }
+
+            setTimeout(() => mapInstance.invalidateSize(), 200);
+        }
+
+        /* ── Near Me ── */
+        function zoomToMe() {
+            if (!navigator.geolocation) { alert('Geolocation not supported.'); return; }
+            const btn = document.getElementById('nearMeBtn');
+            btn.classList.add('loading');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
+
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const { latitude: lat, longitude: lng } = pos.coords;
+                    mapInstance.setView([lat, lng], 14, { animate: true });
+
+                    if (userMarker) userMarker.remove();
+                    const userIcon = L.divIcon({
+                        className: '',
+                        html: `<div style="
+                            width:20px;height:20px;
+                            background:#2563eb;
+                            border-radius:50%;
+                            border:3px solid #fff;
+                            box-shadow:0 0 0 6px rgba(37,99,235,0.25);
+                        "></div>`,
+                        iconSize:   [20, 20],
+                        iconAnchor: [10, 10]
+                    });
+                    userMarker = L.marker([lat, lng], { icon: userIcon })
+                        .bindPopup('<strong>You are here</strong>')
+                        .addTo(mapInstance)
+                        .openPopup();
+
+                    btn.classList.remove('loading');
+                    btn.innerHTML = '<i class="fas fa-location-crosshairs"></i> Near Me';
+                },
+                err => {
+                    btn.classList.remove('loading');
+                    btn.innerHTML = '<i class="fas fa-location-crosshairs"></i> Near Me';
+                    let msg = 'Unable to get your location.';
+                    if (err.code === 1) msg = 'Location permission denied.';
+                    alert(msg);
+                }
+            );
+        }
+    </script>
+
+    <!-- Floating Map Button -->
+    <a href="{% url 'business_map' %}" class="map-float-btn" title="View businesses on map" style="display: flex; align-items: center; justify-content: center; text-decoration: none;">
+        <span class="map-float-label">View on Map</span>
+        <i class="fas fa-map-location-dot"></i>
+    </a>
+
+    <!-- Floating Chatbot Button -->
+    <a href="{% url 'chatbot' %}" class="chatbot-float" title="Chat with Assistant">
+        <i class="fas fa-robot"></i>
+    </a>
+
+    <style>
+        .chatbot-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #059669, #10b981);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+            text-decoration: none;
+        }
+
+        .chatbot-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(5, 150, 105, 0.5);
+        }
+
+        .chatbot-float i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .chatbot-float::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #059669, #10b981);
+            animation: chatPulse 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes chatPulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .chatbot-float {
+                bottom: 20px;
+                right: 20px;
+                width: 55px;
+                height: 55px;
+            }
+
+            .chatbot-float i {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</body>
+
+</html>

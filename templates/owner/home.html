@@ -1,0 +1,840 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard | Premium Insights</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-gray: #f8f9fa;
+            --text-dark: #1f2937;
+            --text-gray: #6b7280;
+            --border-light: #e5e7eb;
+            --white: #ffffff;
+            --sidebar-width: 280px;
+            --sidebar-width-collapsed: 80px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            display: flex;
+            min-height: 100vh;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--white);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        body.sidebar-closed .sidebar {
+            width: var(--sidebar-width-collapsed);
+        }
+
+        .logo-container {
+            padding: 2rem 1.5rem;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 80px;
+            gap: 1rem;
+        }
+
+        body.sidebar-closed .logo-container {
+            justify-content: center;
+            padding: 1rem;
+            gap: 0;
+        }
+
+        .logo-img {
+            max-width: 130px;
+            height: auto;
+            transition: all 0.3s;
+            margin-top: 12px;
+        }
+
+        body.sidebar-closed .logo-img {
+            display: none;
+        }
+
+        #sidebarToggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: color 0.2s;
+            min-width: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #sidebarToggle:hover {
+            color: var(--primary);
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .nav-section-title {
+            color: var(--text-gray);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin: 1.5rem 0 0.75rem 0.75rem;
+            text-transform: uppercase;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        body.sidebar-closed .nav-section-title {
+            opacity: 0;
+            visibility: hidden;
+            height: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        body.sidebar-closed .nav-item {
+            justify-content: center;
+            padding: 0.75rem 0;
+        }
+
+        .nav-item i {
+            width: 1.5rem;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: margin 0.3s;
+        }
+
+        body.sidebar-closed .nav-item i {
+            margin-right: 0;
+            font-size: 1.25rem;
+        }
+
+        .nav-item span {
+            transition: opacity 0.3s;
+        }
+
+        body.sidebar-closed .nav-item span {
+            display: none;
+        }
+
+        .nav-item:hover {
+            background-color: #eff6ff;
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .nav-item.active:hover {
+            color: var(--white);
+        }
+
+        .user-profile {
+            padding: 1rem;
+            margin: 1rem;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(to right, #f8fafc, #f1f5f9);
+            border-radius: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-profile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+
+        .user-profile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border-color: var(--primary);
+        }
+
+        .user-profile:hover::before {
+            transform: translateX(100%);
+        }
+
+        body.sidebar-closed .user-profile {
+            padding: 0.5rem;
+            margin: 0.5rem;
+            justify-content: center;
+            background: transparent;
+            flex-direction: column;
+            gap: 1rem;
+            border: none;
+            box-shadow: none;
+        }
+
+        .avatar {
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            transition: margin 0.3s;
+            font-size: 1rem;
+        }
+
+        body.sidebar-closed .avatar {
+            margin-right: 0;
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            font-size: 1rem;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+            transition: opacity 0.3s;
+        }
+
+        body.sidebar-closed .user-info {
+            display: none;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-dark);
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+        }
+
+        .logout-btn {
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: color 0.2s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        body.sidebar-closed .logout-btn {
+            display: flex;
+            margin-left: 0;
+            margin-top: 0;
+        }
+
+        .logout-btn:hover {
+            color: #ef4444;
+            background-color: #fee2e2;
+        }
+
+        /* Main Content */
+        .main-container {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem 2.5rem;
+            transition: var(--transition);
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        body.sidebar-closed .main-container {
+            margin-left: var(--sidebar-width-collapsed);
+            width: calc(100% - var(--sidebar-width-collapsed));
+        }
+
+        /* Header Section */
+        .welcome-section {
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .welcome-text h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+        }
+
+        .welcome-text p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: -20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.03;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #fff;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .stat-icon-wrapper.blue { background: var(--primary-gradient); }
+        .stat-icon-wrapper.green { background: var(--secondary-gradient); }
+        .stat-icon-wrapper.amber { background: var(--accent-gradient); }
+        .stat-icon-wrapper.purple { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
+
+        /* Highlights & Charts Grid */
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+        }
+
+        .col-main { grid-column: span 8; }
+        .col-side { grid-column: span 4; }
+
+        @media (max-width: 1200px) {
+            .col-main, .col-side { grid-column: span 12; }
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            height: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: #2563eb;
+        }
+
+        /* Top Performer Spotlights */
+        .spotlight-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .spotlight-card {
+            padding: 1.25rem;
+            border-radius: 18px;
+            background: #f9fafb;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+
+        .spotlight-card:hover {
+            background: #fff;
+            border-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .spotlight-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .spotlight-info h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .spotlight-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Charts */
+        .chart-box {
+            padding-top: 1rem;
+            height: 280px;
+            position: relative;
+        }
+
+        /* Activity Feed */
+        .feed-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .feed-item {
+            padding: 1.25rem;
+            border-radius: 18px;
+            background: #f9fafb;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .feed-item:hover {
+            transform: scale(1.02);
+            background: white;
+            border-color: #2563eb;
+        }
+
+        .feed-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .feed-biz {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #2563eb;
+            letter-spacing: 0.5px;
+        }
+
+        .feed-user {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feed-rating {
+            color: #f59e0b;
+            font-size: 0.8rem;
+        }
+
+        .feed-content {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 32px;
+            border: 2px dashed var(--border-color);
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            color: #d1d5db;
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .empty-button {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 2rem;
+            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.2);
+            transition: var(--transition);
+        }
+
+        .empty-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 20px rgba(79, 70, 229, 0.3);
+        }
+
+    </style>
+</head>
+
+<body class="sidebar-closed">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="logo-container">
+            <button id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="{% static 'logo.png' %}" alt="Logo" class="logo-img">
+        </div>
+
+        <div class="nav-menu">
+            <a href="#" class="nav-item active">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <div class="nav-section-title">MANAGEMENT</div>
+            <a href="/addbusiness" class="nav-item">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add Business</span>
+            </a>
+
+            <a href="/manage_business" class="nav-item">
+                <i class="fas fa-building"></i>
+                <span>My Businesses</span>
+            </a>
+
+            <div class="nav-section-title">SUPPORT</div>
+            <a href="/contact" class="nav-item">
+                <i class="fas fa-headset"></i>
+                <span>Contact Support</span>
+            </a>
+        </div>
+
+        <a href="{% url 'owner_profile' %}" style="text-decoration: none; color: inherit;">
+            <div class="user-profile">
+                <div class="avatar" {% if owner.profile_image %}style="background: none; padding: 0;" {% endif %}>
+                    {% if owner.profile_image %}
+                    <img src="{{ owner.profile_image }}" alt="Profile"
+                        style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                    {% else %}
+                    {{ user_email|make_list|first|upper }}
+                    {% endif %}
+                </div>
+                <div class="user-info">
+                    <div class="user-name">{{ user_email|default:"User" }}</div>
+                    <div class="user-role">Owner Account</div>
+                </div>
+                <a href="{% url 'ologout' %}" class="logout-btn" title="Logout" onclick="event.stopPropagation();">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </a>
+    </nav>
+
+    <main class="main-container">
+        <div class="welcome-section">
+            <div class="welcome-text">
+                <h1 id="greeting">Welcome back, Owner</h1>
+                <p id="currentDate">Analytics Dashboard Overview</p>
+            </div>
+        </div>
+
+        {% if not has_approved_business %}
+        <div class="empty-state">
+            <i class="fas fa-rocket empty-icon"></i>
+            <h2 class="empty-title">Ready to launch?</h2>
+            <p style="color: var(--text-muted); max-width: 400px;">Your businesses are currently in the workshop. Add your first venture to start tracking performance metrics.</p>
+            <a href="/addbusiness" class="empty-button">Bootstrap New Business</a>
+        </div>
+        {% else %}
+
+        <div class="stats-grid">
+            <div class="stat-card" style="color: #2563eb;">
+                <div class="stat-header">
+                    <div class="stat-icon-wrapper blue">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <i class="fas fa-arrow-up-right-from-square" style="font-size: 0.8rem; opacity: 0.3;"></i>
+                </div>
+                <div>
+                    <h3 class="stat-value">{{ labels|length }}</h3>
+                    <p class="stat-label">Ventures Managed</p>
+                </div>
+            </div>
+
+            <div class="stat-card" style="color: #ec4899;">
+                <div class="stat-header">
+                    <div class="stat-icon-wrapper" style="background: linear-gradient(135deg, #f472b6, #ec4899);">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="stat-value">{{ total_likes }}</h3>
+                    <p class="stat-label">Engagement Likes</p>
+                </div>
+            </div>
+
+            <div class="stat-card" style="color: #10b981;">
+                <div class="stat-header">
+                    <div class="stat-icon-wrapper green">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="stat-value">{{ total_visits }}</h3>
+                    <p class="stat-label">Global Visits</p>
+                </div>
+            </div>
+
+            <div class="stat-card" style="color: #f59e0b;">
+                <div class="stat-header">
+                    <div class="stat-icon-wrapper amber">
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="stat-value">{{ avg_rating }}</h3>
+                    <p class="stat-label">Avg Sat Rating</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="col-main">
+                <div class="glass-card" style="margin-bottom: 1.5rem;">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-trophy"></i> Elite Rank Performers</h3>
+                    </div>
+                    <div class="spotlight-grid">
+                        {% if most_visited_business %}
+                        <div class="spotlight-card">
+                            <div class="spotlight-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="spotlight-info">
+                                <h4>{{ most_visited_business.shop }}</h4>
+                                <p>Volume: {{ most_visited_business.v_count }} Visits</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if top_rated_business %}
+                        <div class="spotlight-card">
+                            <div class="spotlight-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                                <i class="fas fa-award"></i>
+                            </div>
+                            <div class="spotlight-info">
+                                <h4>{{ top_rated_business.shop }}</h4>
+                                <p>Reputation: {{ top_rated_business.r_avg|floatformat:1 }} Stars</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="col-side">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-bolt"></i> Live Feedback</h3>
+                        <span style="font-size: 0.7rem; color: #10b981; font-weight: 700; background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: 20px;">Pulse Live</span>
+                    </div>
+
+                    <div class="feed-container">
+                        {% for review in recent_reviews %}
+                        <div class="feed-item">
+                            <div class="feed-meta">
+                                <span class="feed-biz">{{ review.business.shop }}</span>
+                                <div class="feed-rating">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <i class="fas fa-star" style="font-size: 0.6rem;"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <h5 class="feed-user">{{ review.user.username }}</h5>
+                            <p class="feed-content">"{{ review.content }}"</p>
+                        </div>
+                        {% empty %}
+                        <div style="text-align: center; padding: 3rem 1rem;">
+                            <i class="fas fa-comment-slash" style="font-size: 2.5rem; color: #e5e7eb; margin-bottom: 1rem;"></i>
+                            <p style="color: var(--text-muted); font-size: 0.85rem;">Listening for engagement...<br>No signals detected yet.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- Data Injection -->
+    <script id="dashboardData" type="application/json">
+    {
+        "has_approved_business": {{ has_approved_business|yesno:"true,false" }},
+        "labels": {{ labels|safe|default:"[]" }},
+        "data": {{ data|default:"[]" }},
+        "visits_data": {{ visits_data|default:"[]" }},
+        "traffic_labels": {{ traffic_labels|safe|default:"[]" }},
+        "traffic_values": {{ traffic_values|default:"[]" }}
+    }
+    </script>
+
+    <script>
+        // Toggle Sidebar
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.body.classList.toggle('sidebar-closed');
+        });
+
+        // Greeting Logic
+        const hour = new Date().getHours();
+        const greetingElement = document.getElementById('greeting');
+        let greeting = "Good morning";
+        if (hour >= 12 && hour < 17) greeting = "Good afternoon";
+        else if (hour >= 17) greeting = "Good evening";
+        
+        const userEmail = "{{ user_email|default:'' }}";
+        const namePart = userEmail ? userEmail.split('@')[0] : 'Owner';
+        const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+        greetingElement.textContent = `${greeting}, ${formattedName}`;
+
+        // Date Display
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').textContent = `Overview for ${new Date().toLocaleDateString('en-US', options)}`;
+
+
+    </script>
+</body>
+
+</html>

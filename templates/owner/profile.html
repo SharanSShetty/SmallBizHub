@@ -1,0 +1,555 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Profile | Premium Insights</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-gray: #f8f9fa;
+            --text-dark: #1f2937;
+            --text-gray: #6b7280;
+            --border-light: #e5e7eb;
+            --white: #ffffff;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            min-height: 100vh;
+            color: var(--text-dark);
+            padding: 2rem;
+        }
+
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .glass-card {
+            background: var(--white);
+            border-radius: 24px;
+            border: 1px solid var(--border-light);
+            padding: 2.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .avatar-lg {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .avatar-lg img {
+            width: 100%;
+            height: 100%;
+            border-radius: 30px;
+            object-fit: cover;
+        }
+
+        .header-info h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-info p {
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .form-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .form-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-section h3 i {
+            color: var(--primary);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            padding-left: 2.75rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            font-size: 1rem;
+            font-weight: 500;
+            background-color: var(--white);
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-control:disabled {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+            color: var(--text-gray);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        .phone-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .phone-group .input-wrapper {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background-color: white;
+            border: 1px solid var(--border-light);
+            color: var(--text-dark);
+        }
+
+        .btn-outline:hover {
+            background-color: #f9fafb;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-left: 0.5rem;
+        }
+
+        .badge-verified {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .badge-pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--accent);
+        }
+
+        /* OTP Overlay Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .otp-display {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 1.25rem;
+            border-radius: 16px;
+            font-size: 2rem;
+            letter-spacing: 0.5rem;
+            font-weight: 700;
+            margin: 1.5rem 0;
+            border: 2px dashed #f59e0b;
+        }
+
+        .otp-input-field {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid var(--border-light);
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .otp-input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .messages {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .message.success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .message.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+        <a href="/home" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+
+        <div class="glass-card">
+            <div class="profile-header">
+                <div class="avatar-lg">
+                    {% if owner.profile_image %}
+                        <img src="{{ owner.profile_image }}" alt="Profile">
+                    {% else %}
+                        {{ owner.email|make_list|first|upper }}
+                    {% endif %}
+                </div>
+                <div class="header-info">
+                    <h1>Profile Settings</h1>
+                    <p>Manage your account preferences</p>
+                </div>
+            </div>
+
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li class="message {{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            <form method="post" id="profileForm">
+                {% csrf_token %}
+                
+                <div class="form-section">
+                    <h3><i class="fas fa-user-circle"></i> Personal Information</h3>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <div class="input-wrapper">
+                                <input type="email" name="email" value="{{ profile_email }}" class="form-control" placeholder="Enter email address">
+                                <i class="fas fa-envelope input-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                Phone Number
+                                {% if owner.phone_verified %}
+                                    <span class="status-badge badge-verified" id="verifiedBadge"><i class="fas fa-check-circle"></i> Verified</span>
+                                {% else %}
+                                    <span class="status-badge badge-pending" id="verifiedBadge"><i class="fas fa-clock"></i> Unverified</span>
+                                {% endif %}
+                            </label>
+                            <div class="phone-group">
+                                <div class="input-wrapper">
+                                    <input type="text" name="phone_number" id="phoneInput" value="{{ owner.phone_number|default:'' }}" class="form-control" placeholder="Enter phone number">
+                                    <i class="fas fa-phone input-icon"></i>
+                                </div>
+                                <!-- Hidden data element for Django context values -->
+                                <span id="phoneProfileData" style="display:none;"
+                                    data-verified="{% if owner.phone_verified %}true{% else %}false{% endif %}"
+                                    data-original-phone="{{ owner.phone_number|default:'' }}"></span>
+                                <button type="button" id="verifyBtn" class="btn btn-outline">
+                                    Verify
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--border-light); padding-top: 2rem;">
+                    <button type="button" class="btn btn-outline" onclick="window.location.href='/home'">Cancel</button>
+                    <button type="submit" id="saveBtn" class="btn btn-primary" {% if not owner.phone_verified and owner.phone_number %}disabled{% endif %}>
+                        <i class="fas fa-save"></i> Save Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- OTP Modal -->
+    <div class="modal" id="otpModal">
+        <div class="modal-content">
+            <h2>Phone Verification</h2>
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">Enter the verification code shown below</p>
+            
+            <div class="otp-display" id="otpValue">123456</div>
+            
+            <input type="text" id="otpInput" class="otp-input-field" maxlength="6" placeholder="000000">
+            
+            <button type="button" id="submitOtpBtn" class="btn btn-primary" style="width: 100%;">
+                Confirm Verification
+            </button>
+            <button type="button" class="btn btn-outline" style="width: 100%; margin-top: 0.75rem;" onclick="hideModal()">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const phoneInput = document.getElementById('phoneInput');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const otpModal = document.getElementById('otpModal');
+        const otpValueDisplay = document.getElementById('otpValue');
+        const otpInput = document.getElementById('otpInput');
+        const submitOtpBtn = document.getElementById('submitOtpBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const profileForm = document.getElementById('profileForm');
+
+        const phoneProfileData = document.getElementById('phoneProfileData');
+        let isVerified = phoneProfileData.dataset.verified === 'true';
+        let originalPhone = phoneProfileData.dataset.originalPhone;
+
+        // Initial state: if already verified, hide Verify btn and enable Save
+        if (isVerified) {
+            verifyBtn.style.display = 'none';
+            saveBtn.disabled = false;
+        }
+
+        phoneInput.addEventListener('input', () => {
+            const currentVal = phoneInput.value.trim();
+            if (currentVal === originalPhone && isVerified) {
+                // Reverted to verified number
+                saveBtn.disabled = false;
+                verifyBtn.style.display = 'none';
+                verifyBtn.innerHTML = 'Verify';
+                verifyBtn.style.color = '';
+                verifyBtn.style.borderColor = '';
+                if (verifiedBadge) {
+                    verifiedBadge.className = 'status-badge badge-verified';
+                    verifiedBadge.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
+                }
+            } else if (currentVal !== originalPhone) {
+                // Changed to a new/different number
+                saveBtn.disabled = true;
+                verifyBtn.style.display = 'inline-flex';
+                verifyBtn.innerHTML = 'Verify';
+                verifyBtn.style.color = '';
+                verifyBtn.style.borderColor = '';
+                if (verifiedBadge && currentVal) {
+                    verifiedBadge.className = 'status-badge badge-pending';
+                    verifiedBadge.innerHTML = '<i class="fas fa-clock"></i> Unverified';
+                }
+            }
+        });
+
+        verifyBtn.addEventListener('click', async () => {
+            const phone = phoneInput.value;
+            if (!phone || phone.length < 10) {
+                alert('Please enter a valid phone number');
+                return;
+            }
+
+            verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            verifyBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('phone_number', phone);
+
+            try {
+                const response = await fetch("{% url 'generate_phone_otp' %}", {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    otpValueDisplay.textContent = data.otp;
+                    otpModal.style.display = 'flex';
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                alert('Connection error. Try again.');
+            } finally {
+                verifyBtn.innerHTML = 'Verify';
+                verifyBtn.disabled = false;
+            }
+        });
+
+        submitOtpBtn.addEventListener('click', async () => {
+            const otpData = otpInput.value;
+            if (otpData.length !== 6) {
+                alert('Enter 6-digit OTP');
+                return;
+            }
+
+            submitOtpBtn.disabled = true;
+            submitOtpBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            const formData = new FormData();
+            formData.append('otp', otpData);
+
+            try {
+                const response = await fetch("{% url 'verify_phone_otp' %}", {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Phone number verified successfully!');
+                    otpModal.style.display = 'none';
+                    saveBtn.disabled = false;
+                    verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verified';
+                    verifyBtn.className = 'btn btn-outline';
+                    verifyBtn.style.color = 'var(--success)';
+                    verifyBtn.style.borderColor = 'var(--success)';
+                    isVerified = true;
+                    originalPhone = phoneInput.value;
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                alert('Error connecting');
+            } finally {
+                submitOtpBtn.disabled = false;
+                submitOtpBtn.innerHTML = 'Confirm Verification';
+            }
+        });
+
+        function hideModal() {
+            otpModal.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

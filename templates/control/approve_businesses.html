@@ -1,0 +1,907 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approve Businesses</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        /* Base styles from ahome.html */
+        :root {
+            --primary-color: #23a6d5;
+            --primary-dark: #1c8ab1;
+            --secondary-color: #23d5ab;
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #e2e8f0;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --accent-color: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-container img {
+            max-width: 150px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .nav-links {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-button {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-button:hover {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(35, 166, 213, 0.3);
+            transform: translateX(5px);
+        }
+
+        .logout-section {
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-button {
+            width: 100%;
+            padding: 14px;
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex-grow: 1;
+            margin-left: 280px;
+            padding: 40px;
+            min-height: 100vh;
+            width: calc(100% - 280px);
+            background-color: var(--bg-color);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .welcome-badge {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .welcome-badge::before {
+            content: '';
+            display: block;
+            width: 10px;
+            height: 10px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+        }
+
+        .icon-button {
+            background: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            color: var(--primary-color);
+        }
+
+        .icon-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Card Container - Single Column */
+        .card-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* Professional Card Design */
+        .business-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid #f1f5f9;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .business-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Card Header */
+        .card-header {
+            background: white;
+            padding: 24px 30px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-info h2 {
+            font-size: 22px;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .owner-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            background: #f8fafc;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Card Body - Grid Layout */
+        .card-body {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 40px;
+        }
+
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .description-box {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        /* Operating Hours Table */
+        .hours-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .hours-table td {
+            padding: 6px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .hours-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .day-col {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .time-col {
+            text-align: right;
+            color: var(--text-secondary);
+        }
+
+        .closed-tag {
+            color: var(--danger-color);
+            font-weight: 500;
+        }
+
+        /* Pills and Tags */
+        .type-pill {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0284c7;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Social Media */
+        .social-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 13px;
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
+        }
+
+        .social-link:hover {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        /* Proof Document */
+        .proof-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            color: #b45309;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .proof-box a {
+            color: #b45309;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        /* Image Gallery Strip */
+        .gallery-section {
+            padding: 20px 30px;
+            background: #f8fafc;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .image-strip {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .image-strip::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .image-strip::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .strip-img {
+            height: 100px;
+            width: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+        }
+
+        .strip-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        /* Action Buttons */
+        .btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .btn-approve {
+            background: var(--success-color);
+            color: white;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-approve:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-reject {
+            background: white;
+            color: var(--danger-color);
+            border: 1px solid #fda4af;
+        }
+
+        .btn-reject:hover {
+            background: #fef2f2;
+            border-color: var(--danger-color);
+        }
+
+        /* Fullscreen Overlay */
+        .fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .fullscreen-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .fullscreen-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .fullscreen-close:hover {
+            opacity: 1;
+        }
+
+        .fullscreen-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .fullscreen-nav:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .fullscreen-prev {
+            left: 30px;
+        }
+
+        .fullscreen-next {
+            right: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .card-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .hamburger {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div style="position: fixed; top: 15px; left: 15px; z-index: 101;" class="hamburger"
+        onclick="document.querySelector('.sidebar').classList.toggle('active')">
+        ☰
+    </div>
+
+    <nav class="sidebar">
+        <div class="logo-container">
+            <img src="{% static 'logo.png' %}" alt="Logo">
+        </div>
+
+        <div class="nav-links">
+            <a href="{% url 'admin_home' %}" class="nav-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="margin-right: 10px;">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>Home</span>
+            </a>
+            <a href="/handle/manage_business" class="nav-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="margin-right: 10px;">
+                    <rect x="3" y="7" width="18" height="13" rx="2" ry="2" />
+                    <path d="M16 3H8v4h8V3z" />
+                </svg>
+                <span>Manage Business</span>
+            </a>
+            <a href="/handle/manage" class="nav-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="margin-right: 10px;">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="3" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <span>Manage Owners</span>
+            </a>
+        </div>
+
+        <div class="logout-section">
+            <form action="{% url 'admin_logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="logout-button">Sign Out</button>
+            </form>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header>
+            <h1>Pending Approvals</h1>
+            <div class="header-actions">
+                <a href="{% url 'admin_chat_list' %}" class="icon-button" title="Messages">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </a>
+                <div class="welcome-badge">
+                    {{ email }}
+                </div>
+            </div>
+        </header>
+
+        <div class="card-container">
+            {% for business in businesses %}
+            <div class="card business-card">
+                <!-- Card Header with Title and Actions -->
+                <div class="card-header">
+                    <div class="header-info">
+                        <h2>{{ business.shop }}</h2>
+                        <div class="owner-badge">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span>{{ business.name }}</span>
+                            <span style="opacity: 0.5;">|</span>
+                            <span>{{ business.owner.email }}</span>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-reject" data-id="{{ business.id }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            Reject
+                        </button>
+                        <button class="btn btn-approve" data-id="{{ business.id }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            Approve Request
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Split Body Content -->
+                <div class="card-body">
+                    <!-- Left Column: Primary Info -->
+                    <div class="info-section">
+                        <div class="section-title">Business Details</div>
+
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Type</span>
+                                <div><span class="type-pill">{{ business.business_type }}</span></div>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Contact</span>
+                                <span class="info-value">{{ business.mobile_number }}</span>
+                            </div>
+                            <div class="info-item" style="grid-column: span 2;">
+                                <span class="info-label">Address</span>
+                                <span class="info-value">{{ business.business_address }}</span>
+                            </div>
+                        </div>
+
+                        {% if business.description %}
+                        <div class="description-box">
+                            <div class="section-title" style="margin-bottom: 6px;">Description</div>
+                            {{ business.description }}
+                        </div>
+                        {% endif %}
+
+                        {% if business.social_media_links.exists %}
+                        <div style="margin-top: 10px;">
+                            <div class="section-title">Online Presence</div>
+                            <div class="social-links">
+                                {% for link in business.social_media_links.all %}
+                                <a href="{{ link.url }}" target="_blank" class="social-link">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                                        <path
+                                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                                        </path>
+                                    </svg>
+                                    {{ link.platform }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Right Column: Secondary Info -->
+                    <div class="info-section">
+                        <div class="section-title">Operations & Verification</div>
+
+                        {% if business.operating_hours.exists %}
+                        <table class="hours-table">
+                            {% for hour in business.operating_hours.all %}
+                            <tr>
+                                <td class="day-col">{{ hour.get_day_of_week_display }}</td>
+                                <td class="time-col">
+                                    {% if hour.is_closed %}
+                                    <span class="closed-tag">Closed</span>
+                                    {% else %}
+                                    {{ hour.open_time|time:"g:i A" }} - {{ hour.close_time|time:"g:i A" }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        {% endif %}
+
+                        {% if business.proof_of_business %}
+                        <div class="proof-box">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            <div>
+                                <div style="font-weight: 600;">Verification Document</div>
+                                {% if business.proof_of_business.url|slice:"-4:" == ".pdf" %}
+                                <a href="{{ business.proof_of_business.url }}" target="_blank">View PDF Document</a>
+                                {% else %}
+                                <a href="{{ business.proof_of_business.url }}" target="_blank">View Image Proof</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="proof-box" style="background: #fef2f2; color: #b91c1c; border-color: #fca5a5;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <div>No proof document submitted</div>
+                        </div>
+                        {% endif %}
+
+                        <div style="margin-top: 15px;">
+                            <div class="section-title">Location</div>
+                            {% if business.latitude and business.longitude %}
+                            <a href="https://www.google.com/maps?q={{ business.latitude }},{{ business.longitude }}"
+                                target="_blank"
+                                style="color: var(--accent-color); text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                Open in Google Maps
+                            </a>
+                            {% else %}
+                            <span style="color: var(--text-secondary); font-size: 14px;">{{ business.google_map_location
+                                }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Full Width Image Gallery -->
+                <div class="gallery-section">
+                    <div class="section-title">Business Photos</div>
+                    <div class="image-strip" data-business-id="{{ business.id }}">
+                        {% for image in business.images.all %}
+                        <img src="{{ image.image.url }}" alt="Business Image" class="strip-img" loading="lazy"
+                            data-full-src="{{ image.image.url }}">
+                        {% empty %}
+                        <p style="color: var(--text-secondary); font-size: 13px; font-style: italic;">No additional
+                            photos provided.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <div class="fullscreen-overlay">
+        <img src="/placeholder.svg" alt="Fullscreen Image" class="fullscreen-image">
+        <div class="fullscreen-close">&times;</div>
+        <div class="fullscreen-nav fullscreen-prev">&lt;</div>
+        <div class="fullscreen-nav fullscreen-next">&gt;</div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Approval Logic
+            $(document).on('click', '.btn-approve, .btn-reject', function () {
+                const btn = $(this);
+                const originalContent = btn.html();
+                const isApprove = btn.hasClass('btn-approve');
+
+                btn.prop('disabled', true);
+                btn.html(isApprove ? 'Approving...' : 'Rejecting...');
+
+                const businessId = btn.data('id');
+                const action = isApprove ? 'approve' : 'reject';
+                const csrfToken = "{{ csrf_token }}";
+
+                $.ajax({
+                    url: "",
+                    method: "POST",
+                    data: {
+                        csrfmiddlewaretoken: csrfToken,
+                        business_id: businessId,
+                        action: action
+                    },
+                    success: function (response) {
+                        alert(response.message);
+                        location.reload();
+                    },
+                    error: function () {
+                        alert('An error occurred');
+                        btn.prop('disabled', false);
+                        btn.html(originalContent);
+                    }
+                });
+            });
+
+            // Fullscreen Logic
+            let currentGallery = [];
+            let currentIndex = 0;
+
+            $('.strip-img').click(function () {
+                const businessId = $(this).closest('.image-strip').data('business-id');
+                currentGallery = $(`.image-strip[data-business-id="${businessId}"] .strip-img`).map(function () {
+                    return $(this).data('full-src');
+                }).get();
+                currentIndex = currentGallery.indexOf($(this).data('full-src'));
+                showFullscreenImage(currentGallery[currentIndex]);
+            });
+
+            $('.fullscreen-close').click(closeFullscreenImage);
+
+            $('.fullscreen-prev').click(function () {
+                currentIndex = (currentIndex - 1 + currentGallery.length) % currentGallery.length;
+                showFullscreenImage(currentGallery[currentIndex]);
+            });
+
+            $('.fullscreen-next').click(function () {
+                currentIndex = (currentIndex + 1) % currentGallery.length;
+                showFullscreenImage(currentGallery[currentIndex]);
+            });
+
+            function showFullscreenImage(src) {
+                $('.fullscreen-image').attr('src', src);
+                $('.fullscreen-overlay').css('display', 'flex');
+            }
+
+            function closeFullscreenImage() {
+                $('.fullscreen-overlay').hide();
+            }
+
+            $(document).keydown(function (e) {
+                if ($('.fullscreen-overlay').is(':visible')) {
+                    if (e.key === "Escape") closeFullscreenImage();
+                    if (e.key === "ArrowLeft") $('.fullscreen-prev').click();
+                    if (e.key === "ArrowRight") $('.fullscreen-next').click();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

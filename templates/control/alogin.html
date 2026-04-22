@@ -1,0 +1,469 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #23a6d5;
+            --primary-dark: #1c8ab1;
+            --text-color: #333;
+            --bg-color: #eef2f3;
+            --error-color: #e73c7e;
+            --success-color: #28a745;
+            --input-bg: #f0f4f8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #f5f7fa, #c3cfe2, #eef2f3, #dfe9f3);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: containerAppear 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes containerAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Staggered Animation for children */
+        .login-container>* {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .logo-section {
+            animation-delay: 0.2s;
+        }
+
+        h2 {
+            animation-delay: 0.3s;
+        }
+
+        .subtitle {
+            animation-delay: 0.4s;
+        }
+
+        .messages {
+            animation-delay: 0.4s;
+        }
+
+        form {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-section {
+            margin-bottom: 25px;
+        }
+
+        .logo-section img {
+            height: 140px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        h2 {
+            color: var(--text-color);
+            margin-bottom: 5px;
+            font-weight: 700;
+            font-size: 28px;
+            letter-spacing: -0.5px;
+        }
+
+        p.subtitle {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        /* Floating Label Styles */
+        input {
+            width: 100%;
+            padding: 0 16px;
+            height: 56px;
+            border: 2px solid transparent;
+            background-color: var(--input-bg);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-family: inherit;
+            color: #333;
+            /* Flex layout support for some browsers on inputs isn't standard, using line-height or padding is better. */
+            /* Since height is 56px, and font is 16px. (56-16)/2 = 20px padding if border is 0. 
+               But border is 2px. So inner height 52px. (52-16)/2 = 18px padding. 
+               Let's just use padding: 0 16px and let the browser center text vertically or use line-height. */
+        }
+
+        input:hover {
+            background-color: #e8ecf1;
+        }
+
+        input:focus {
+            outline: none;
+            background-color: #fff;
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(35, 166, 213, 0.15);
+            transform: translateY(-2px);
+        }
+
+        label {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 15px;
+            color: #777;
+            pointer-events: none;
+            transition: all 0.2s ease-out;
+            background-color: transparent;
+            padding: 0 4px;
+            margin: 0;
+            font-weight: 400;
+        }
+
+        /* When input is focused or has content (simulate :not(:placeholder-shown) logic via JS or simple sibling selector if possible)
+           Since Django renders inputs, adding a class via JS for "filled" state is safer. 
+           But we can also use :focus + label and :not(:placeholder-shown) + label logic if we set placeholder=" " on inputs.
+        */
+
+        input:focus+label,
+        input:not(:placeholder-shown)+label,
+        input.filled+label {
+            top: -10px;
+            left: 14px;
+            transform: translateY(0);
+            font-size: 12px;
+            color: var(--primary-color);
+            font-weight: 600;
+            background-color: #fff;
+            padding: 0 5px;
+            border-radius: 4px;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 5px;
+            transition: color 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 10;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #23d5ab 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            margin-top: 15px;
+            box-shadow: 0 10px 20px -5px rgba(35, 166, 213, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button[type="submit"]::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        button[type="submit"]:hover::after {
+            left: 100%;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px -5px rgba(35, 166, 213, 0.5);
+        }
+
+        button[type="submit"]:active {
+            transform: scale(0.98);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 4px;
+            margin-left: 16px;
+            display: block;
+            min-height: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .messages {
+            list-style: none;
+            margin-bottom: 25px;
+            padding: 0;
+            text-align: left;
+        }
+
+        .messages li {
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .messages li.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .messages li.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="logo-section">
+            <img src="{% static 'logo.png' %}" alt="Mini Project Logo">
+        </div>
+        <h2>Admin Portal</h2>
+        <p class="subtitle">Secure access to your dashboard</p>
+
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                {% endfor %}
+        </ul>
+        {% endif %}
+
+        <form method="post" id="loginForm" novalidate>
+            {% csrf_token %}
+
+            <!-- Username/Email Field -->
+            <div class="form-group">
+                {{ form.email }}
+                <label for="{{ form.email.id_for_label }}">Email Address</label>
+                <span class="error-message" id="emailError"></span>
+            </div>
+
+            <!-- Password Field -->
+            <div class="form-group">
+                <div class="password-container">
+                    {{ form.password }}
+                    <label for="{{ form.password.id_for_label }}">Password</label>
+                    <button type="button" id="togglePassword" class="password-toggle">SHOW</button>
+                </div>
+                <span class="error-message" id="passwordError"></span>
+            </div>
+
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+
+    <script>
+        // Form Validation & Interaction Logic
+        document.addEventListener('DOMContentLoaded', function () {
+            const inputs = document.querySelectorAll('input');
+
+            // Function to handle floating label state
+            function updateInputState(input) {
+                if (input.value.trim() !== '') {
+                    input.classList.add('filled');
+                } else {
+                    input.classList.remove('filled');
+                }
+            }
+
+            // Initialize state and add listeners
+            inputs.forEach(input => {
+                // Add placeholder=" " to allow CSS :placeholder-shown to work if preferred, 
+                // but let's rely on the JS 'filled' class for robustness with auto-fill.
+                input.setAttribute('placeholder', ' ');
+
+                updateInputState(input);
+
+                input.addEventListener('input', () => updateInputState(input));
+                input.addEventListener('blur', () => updateInputState(input));
+
+                // Chrome autofill sometimes doesn't trigger input immediately, check on animation/timeout
+                setTimeout(() => updateInputState(input), 100);
+            });
+
+            // Password Toggle
+            const toggleBtn = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
+
+            if (toggleBtn && passwordInput) {
+                toggleBtn.addEventListener('click', function () {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    this.textContent = type === 'password' ? 'SHOW' : 'HIDE';
+                });
+            }
+
+            // Form Validation
+            document.getElementById('loginForm').addEventListener('submit', function (e) {
+                let valid = true;
+                const email = document.getElementById('{{ form.email.id_for_label }}');
+                const password = document.getElementById('{{ form.password.id_for_label }}');
+                const emailError = document.getElementById('emailError');
+                const passwordError = document.getElementById('passwordError');
+
+                emailError.textContent = '';
+                passwordError.textContent = '';
+
+                // Reset styles
+                email.style.borderColor = 'transparent';
+                password.style.borderColor = 'transparent';
+
+                if (!email.value.trim()) {
+                    emailError.textContent = 'Email is required';
+                    email.style.borderColor = 'var(--error-color)';
+                    valid = false;
+                }
+
+                if (!password.value.trim()) {
+                    passwordError.textContent = 'Password is required';
+                    password.style.borderColor = 'var(--error-color)';
+                    valid = false;
+                }
+
+                if (!valid) {
+                    e.preventDefault();
+                    const container = document.querySelector('.login-container');
+                    container.style.animation = 'none';
+                    container.offsetHeight; /* trigger reflow */
+                    container.style.animation = 'shake 0.5s';
+                }
+            });
+        });
+
+        // Shake Animation
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes shake {
+                0% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                50% { transform: translateX(5px); }
+                75% { transform: translateX(-5px); }
+                100% { transform: translateX(0); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    </script>
+</body>
+
+</html>

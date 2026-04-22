@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ business.name }} - Small BiZ Hub</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Maps will be embedded via iframe using JS; no external JS SDK required here -->
+    <!-- Google Maps will be embedded via iframe using JS; no external JS SDK required here -->
+    <script src="https://cdn.jsdelivr.net/gh/ushelp/EasyQRCodeJS/dist/easy.qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #10b981;
+            /* Emerald 500 */
+            --primary-dark: #059669;
+            /* Emerald 600 */
+            --primary-light: #6ee7b7;
+            /* Emerald 300 */
+            --secondary: #3b82f6;
+            /* Blue 500 */
+            --accent: #ef4444;
+            /* Red 500 */
+            --neutral-50: #f8fafc;
+            --neutral-100: #f1f5f9;
+            --neutral-200: #e2e8f0;
+            --neutral-500: #64748b;
+            --neutral-800: #1e293b;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--neutral-50);
+            color: var(--neutral-800);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navbar (Simplified for Detail Page) */
+        .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--neutral-200);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--neutral-500);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2.5rem;
+        }
+
+        /* Hero / Header Section */
+        .business-header {
+            grid-column: 1 / -1;
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .business-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .header-content h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .business-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            background: #ecfdf5;
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 1rem;
+        }
+
+        .save-btn {
+            background: var(--neutral-100);
+            color: var(--neutral-800);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            background: #e2e8f0;
+        }
+
+        .save-btn.saved {
+            background: #dcfce7;
+            color: var(--primary-dark);
+        }
+
+        .likes-counter {
+            font-size: 0.9rem;
+            color: var(--neutral-500);
+            font-weight: 600;
+        }
+
+        .likes-counter i {
+            color: var(--accent);
+            margin-right: 5px;
+        }
+
+        /* Left Column Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .description-text {
+            color: var(--neutral-500);
+            font-size: 1.1rem;
+            white-space: pre-line;
+        }
+
+        /* Gallery Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            padding-bottom: 100%;
+            /* Square Aspect Ratio */
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .gallery-item img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Right Column (Sidebar) */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .info-card-sticky {
+            position: sticky;
+            top: 100px;
+        }
+
+        .info-header {
+            background: var(--neutral-50);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--neutral-100);
+        }
+
+        .info-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .info-body {
+            padding: 1.5rem;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+            font-size: 0.95rem;
+            color: var(--neutral-500);
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-row i {
+            color: var(--primary);
+            width: 20px;
+            text-align: center;
+            margin-top: 3px;
+        }
+
+        .call-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            text-align: center;
+            background: var(--primary);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .call-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .map-preview {
+            width: 100%;
+            height: 150px;
+            background: var(--neutral-100);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neutral-500);
+            text-decoration: none;
+            margin-top: 1rem;
+            border: 2px dashed var(--neutral-200);
+            transition: all 0.2s;
+        }
+
+        .map-preview:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #f0fdf4;
+        }
+
+        /* Reviews Section */
+        .review-form-card {
+            background: var(--neutral-50);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--neutral-200);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--neutral-200);
+            font-family: inherit;
+            margin-bottom: 1rem;
+            resize: vertical;
+            transition: border 0.3s;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--neutral-800);
+            color: var(--white);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #000;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--neutral-200);
+            color: var(--neutral-500);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 0.5rem;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--neutral-800);
+            color: var(--neutral-800);
+        }
+
+        .review-item {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--neutral-100);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .review-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary-dark);
+            flex-shrink: 0;
+            object-fit: cover;
+        }
+
+        .review-content strong {
+            display: block;
+            margin-bottom: 0.2rem;
+            color: var(--neutral-800);
+        }
+
+        .review-date {
+            font-size: 0.8rem;
+            color: var(--neutral-500);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content-img {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90vh;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 8px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .info-card {
+                position: static;
+                margin-top: 0;
+            }
+
+            .business-header {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .header-actions {
+                align-items: flex-start;
+                flex-direction: row;
+                width: 100%;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 600px) {
+            .container {
+                padding: 0 1rem;
+                margin: 1.5rem auto;
+            }
+
+            .business-header {
+                padding: 1.5rem;
+            }
+
+            .header-content h1 {
+                font-size: 1.8rem;
+            }
+
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.8rem;
+                align-items: stretch;
+                /* Stretch buttons to full width */
+            }
+
+            .header-actions button,
+            .header-actions .likes-counter {
+                width: 100%;
+                justify-content: center;
+                text-align: center;
+            }
+
+            .header-actions .likes-counter {
+                margin-bottom: 0.5rem;
+                /* Separator */
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 0.8rem;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+                /* Reduce card padding */
+            }
+        }
+
+        /* Messages/Alerts */
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+    <style>
+        /* Share Modal & Premium UI */
+        .share-btn {
+            background: linear-gradient(135deg, var(--secondary) 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+            filter: brightness(1.1);
+        }
+
+        /* Glassmorphism Share Modal */
+        .share-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .share-modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .share-modal {
+            background: rgba(255, 255, 255, 0.95);
+            width: 90%;
+            max-width: 500px;
+            margin: auto;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .share-modal-overlay.active .share-modal {
+            transform: scale(1);
+        }
+
+        .share-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .share-header h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--neutral-800) 0%, var(--neutral-500) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Social Grid */
+        .social-label {
+            font-weight: 600;
+            color: var(--neutral-800);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            transition: transform 0.2s;
+        }
+
+        .social-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-text {
+            font-size: 0.8rem;
+            color: var(--neutral-500);
+            font-weight: 500;
+        }
+
+        /* Brand Colors */
+        .bg-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+        }
+
+        .bg-facebook {
+            background: linear-gradient(135deg, #1877F2, #0C5DC7);
+        }
+
+        .bg-twitter {
+            background: #000000;
+        }
+
+        /* X is black */
+        .bg-instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+
+        .bg-telegram {
+            background: linear-gradient(135deg, #229ED9, #1E88BC);
+        }
+
+        .bg-linkedin {
+            background: linear-gradient(135deg, #0077b5, #005885);
+        }
+
+        .bg-email {
+            background: var(--neutral-200);
+            color: var(--neutral-800);
+        }
+
+        /* Mobile Scroll for Social */
+        @media (max-width: 450px) {
+            .social-grid {
+                grid-template-columns: repeat(4, 1fr);
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+        }
+
+        .close-share {
+            background: var(--neutral-100);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--neutral-500);
+            transition: all 0.2s;
+        }
+
+        .close-share:hover {
+            background: var(--neutral-200);
+            color: var(--neutral-800);
+            transform: rotate(90deg);
+        }
+
+        /* Tabs */
+        .share-tabs {
+            display: flex;
+            background: var(--neutral-100);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .share-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            font-weight: 600;
+            color: var(--neutral-500);
+            transition: all 0.3s ease;
+        }
+
+        .share-tab.active {
+            background: white;
+            color: var(--primary-dark);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Link Sharing Styling */
+        .link-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 1rem;
+            background: var(--neutral-50);
+            border: 1px solid var(--neutral-200);
+            border-radius: 12px;
+            color: var(--neutral-800);
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn {
+            background: var(--neutral-800);
+            color: white;
+            border: none;
+            padding: 0 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: black;
+        }
+
+        .native-share-btn {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 2px solid var(--neutral-100);
+            border-radius: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--neutral-800);
+        }
+
+        .native-share-btn:hover {
+            border-color: var(--secondary);
+            color: var(--secondary);
+            background: #eff6ff;
+        }
+
+        /* QR Styling */
+        .qr-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .qr-card {
+            background: transparent;
+            /* Card is now drawn on canvas */
+            padding: 0;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: none;
+        }
+
+        .qr-card canvas {
+            display: block;
+            border-radius: 20px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .qr-actions {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+
+        .btn-download {
+            background: var(--neutral-100);
+            color: var(--neutral-800);
+        }
+
+        .btn-download:hover {
+            background: var(--neutral-200);
+        }
+
+        .btn-share-qr {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-share-qr:hover {
+            background: var(--primary-dark);
+        }
+    /* Trending Badge Styling */
+    .trending-badge {
+        background: linear-gradient(135deg, #059669 0%, #d97706 100%);
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);
+        animation: trendingEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), trendingPulse 2s infinite ease-in-out;
+        cursor: default;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .trending-badge::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+    }
+
+    @keyframes trendingEntrance {
+        from {
+            opacity: 0;
+            transform: translateX(30px) scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+    }
+
+    @keyframes trendingPulse {
+        0% { transform: scale(1); box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3); }
+        50% { transform: scale(1.02); box-shadow: 0 10px 30px rgba(5, 150, 105, 0.5); }
+        100% { transform: scale(1); box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3); }
+    }
+
+    @keyframes shine {
+        0% { left: -100%; }
+        20% { left: 100%; }
+        100% { left: 100%; }
+    }
+
+    .trending-badge i {
+        color: #fbbf24;
+        font-size: 1.1rem;
+        animation: flicker 1.5s infinite;
+    }
+
+    @keyframes flicker {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.2); }
+    }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Simple Navbar -->
+    <nav class="navbar">
+        <a href="{% url 'dashboard' %}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <a href="{% url 'dashboard' %}" class="nav-brand">SmALl BiZ hub</a>
+        <div style="width: 100px;"></div> <!-- Spacer for centering -->
+    </nav>
+
+    <div class="container">
+        <!-- Hero Header -->
+        <div class="business-header">
+            <div class="header-content">
+                <span class="business-badge">{{ business.business_type }}</span>
+                <h1>{{ business.name }}</h1>
+                <div
+                    style="display: flex; align-items: center; gap: 0.5rem; color: var(--neutral-500); margin-top: 0.5rem;">
+                    <i class="fas fa-map-marker-alt" style="color: var(--primary);"></i>
+                    <span>{{ business.shop }}</span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="likes-counter">
+                    <i class="fas fa-heart"></i> {{ business.total_likes }} people like this &nbsp; | &nbsp;
+                    <div style="display: inline-flex; align-items: center; background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.05)); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.4); margin-left: 10px;">
+                        <i class="fas fa-star" style="color: #f59e0b; margin-right: 5px;"></i>
+                        <span style="color: #b45309; font-weight: 800;">{{ business.average_rating }} / 5.0</span>
+                    </div>
+                </div>
+                <!-- Save Button -->
+                <button class="save-btn {% if is_saved %}saved{% endif %}" id="save-btn-{{ business.id }}"
+                    data-business="{{ business.id }}">
+                    {% if is_saved %}
+                    <i class="fas fa-bookmark"></i> Saved
+                    {% else %}
+                    <i class="far fa-bookmark"></i> Save Business
+                    {% endif %}
+                </button>
+
+                <!-- Share Button -->
+                <button class="share-btn" onclick="openShareModal()">
+                    <i class="fas fa-share-alt"></i> Share
+                </button>
+
+                {% if is_trending %}
+                <div class="trending-badge">
+                    <i class="fas fa-fire"></i>
+                    <span>#{{ trending_rank }} Trending in Small Biz Hub</span>
+                </div>
+                {% else %}
+                <a href="{% url 'chatbot' %}" class="share-btn" style="text-decoration: none;">
+                    <i class="fas fa-robot"></i> Ask Assistant
+                </a>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- Left Column: Details & Gallery -->
+        <div class="main-content">
+
+            <!-- Description -->
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-info-circle"></i> About</h2>
+                <div class="description-text">
+                    {% if business.description %}
+                    {{ business.description }}
+                    {% else %}
+                    No description provided for this business.
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Gallery -->
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-images"></i> Gallery</h2>
+                {% if business.images.all %}
+                <div class="gallery-grid">
+                    {% for image in business.images.all %}
+                    <div class="gallery-item" onclick="openModal('{{ image.image.url }}')">
+                        <img src="{{ image.image.url }}" alt="{{ business.name }} photo">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p style="color: var(--neutral-500); font-style: italic;">No images available.</p>
+                {% endif %}
+            </div>
+
+            <!-- Reviews -->
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-star"></i> Reviews</h2>
+
+                <!-- Messages -->
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <div style="text-align: right; margin-top: 1rem;">
+                    <a href="{% url 'post_review' business.id %}" class="btn-primary">Post / View Reviews</a>
+                </div>
+            </div>
+
+        </div> <!-- End Main Content -->
+
+        <!-- Right Column (Sidebar) -->
+        <div class="sidebar">
+            <!-- Contact & Info -->
+            <div class="info-card">
+                <div class="info-header">
+                    <h3>Contact & Info</h3>
+                </div>
+                <div class="info-body">
+                    <div class="info-row">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong>Address</strong>
+                            <p>{{ business.business_address }}</p>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <strong>Hours</strong>
+                            {% if business.hours_of_operation %}
+                            <p>{{ business.hours_of_operation }}</p>
+                            {% elif business.operating_hours.all %}
+                            <p>
+                                {% for oh in business.operating_hours.all %}
+                                {{ oh.get_day_of_week_display }}:
+                                {% if oh.is_closed %}
+                                Closed
+                                {% else %}
+                                {{ oh.open_time|time:"g:i A" }} - {{ oh.close_time|time:"g:i A" }}
+                                {% endif %}
+                                {% if not forloop.last %}<br>{% endif %}
+                                {% endfor %}
+                            </p>
+                            {% else %}
+                            <p>Not specified</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if business.latitude and business.longitude %}
+                    <a href="https://www.google.com/maps?q={{ business.latitude }},{{ business.longitude }}"
+                        target="_blank" class="map-preview">
+                        <div style="text-align: center;">
+                            <i class="fas fa-location-dot"
+                                style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5;"></i><br>
+                            Open in Google Maps
+                        </div>
+                    </a>
+                    {% elif business.google_map_location %}
+                    <a href="{{ business.google_map_location }}" target="_blank" class="map-preview">
+                        <div style="text-align: center;">
+                            <i class="fas fa-location-dot"
+                                style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5;"></i><br>
+                            Open in Google Maps
+                        </div>
+                    </a>
+                    {% endif %}
+
+                    <a href="tel:{{ business.mobile_number }}" class="call-btn">
+                        <i class="fas fa-phone-alt"></i> Call Now
+                    </a>
+                </div>
+            </div>
+
+            <!-- App Location Map Card -->
+            {% if business.latitude and business.longitude %}
+            <div class="info-card info-card-sticky">
+                <div class="info-header">
+                    <h3><i class="fas fa-map-marked-alt" style="color: var(--primary); margin-right: 8px;"></i> Shop
+                        Location</h3>
+                </div>
+                <div class="info-body" style="padding: 0;">
+                    <div id="map" style="height: 250px; width: 100%;"></div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div> <!-- End Sidebar -->
+    </div> <!-- End Container -->
+
+    <!-- Glassmorphism Share Modal -->
+    <div id="shareModal" class="share-modal-overlay">
+        <div class="share-modal">
+            <div class="share-header">
+                <h3>Share Business</h3>
+                <button class="close-share" onclick="closeShareModal()"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="share-tabs">
+                <div class="share-tab active" onclick="switchTab('link')">Share Link</div>
+                <div class="share-tab" onclick="switchTab('qr')">QR Code</div>
+            </div>
+
+            <!-- Tab: Link -->
+            <div id="tab-link" class="tab-content active">
+                <div class="link-box">
+                    <input type="text" class="url-input" value="{{ request.build_absolute_uri }}" readonly
+                        id="shareUrl">
+                    <button class="copy-btn" onclick="copyShareLink()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+
+                <span class="social-label">Share via</span>
+                <div class="social-grid">
+                    <button class="social-item" onclick="shareTo('whatsapp')">
+                        <div class="social-icon bg-whatsapp"><i class="fab fa-whatsapp"></i></div>
+                        <span class="social-text">WhatsApp</span>
+                    </button>
+                    <button class="social-item" onclick="shareTo('facebook')">
+                        <div class="social-icon bg-facebook"><i class="fab fa-facebook-f"></i></div>
+                        <span class="social-text">Facebook</span>
+                    </button>
+                    <button class="social-item" onclick="shareTo('twitter')">
+                        <div class="social-icon bg-twitter">
+                            <!-- SVG for X Logo -->
+                            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 24px; height: 24px; fill: white;">
+                                <path
+                                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z">
+                                </path>
+                            </svg>
+                        </div>
+                        <span class="social-text">X</span>
+                    </button>
+                    <button class="social-item" onclick="shareTo('instagram')">
+                        <div class="social-icon bg-instagram"><i class="fab fa-instagram"></i></div>
+                        <span class="social-text">Instagram</span>
+                    </button>
+                    <button class="social-item" onclick="shareTo('telegram')">
+                        <div class="social-icon bg-telegram"><i class="fab fa-telegram-plane"></i></div>
+                        <span class="social-text">Telegram</span>
+                    </button>
+                    <button class="social-item" onclick="shareTo('linkedin')">
+                        <div class="social-icon bg-linkedin"><i class="fab fa-linkedin-in"></i></div>
+                        <span class="social-text">LinkedIn</span>
+                    </button>
+                    <button class="social-item" onclick="shareTo('email')">
+                        <div class="social-icon bg-email"><i class="fas fa-envelope"></i></div>
+                        <span class="social-text">Email</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab: QR -->
+            <div id="tab-qr" class="tab-content">
+                <div class="qr-wrapper">
+                    <div id="rawQr" style="display: none;"></div> <!-- Hidden Raw QR -->
+                    <div class="qr-card" id="qrContainer"></div> <!-- Premium Canvas -->
+                    <div class="qr-actions">
+                        <button class="action-btn btn-download" onclick="downloadQR()">
+                            <i class="fas fa-download"></i> Save Card
+                        </button>
+                        <button class="action-btn btn-share-qr" onclick="shareQRImage()">
+                            <i class="fas fa-paper-plane"></i> Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content-img" id="modalImg">
+    </div>
+
+    {% if business.latitude and business.longitude %}
+    <script>
+        // Save Button Logic
+        document.querySelectorAll('.save-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                let businessId = this.dataset.business;
+                let saveBtn = this;
+
+                // Disable button temporarily
+                saveBtn.disabled = true;
+                saveBtn.style.opacity = '0.7';
+
+                fetch(`/users/save_business/${businessId}/`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message === 'Saved') {
+                            saveBtn.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
+                            saveBtn.classList.add('saved');
+                        } else {
+                            saveBtn.innerHTML = '<i class="far fa-bookmark"></i> Save Business';
+                            saveBtn.classList.remove('saved');
+                        }
+                        saveBtn.disabled = false;
+                        saveBtn.style.opacity = '1';
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        saveBtn.disabled = false;
+                        saveBtn.style.opacity = '1';
+                    });
+            });
+        });
+
+        // Image Modal Logic
+        function openModal(src) {
+            const modal = document.getElementById('imageModal');
+            const img = document.getElementById('modalImg');
+            img.src = src;
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function (event) {
+            if (event.key === "Escape") {
+                closeModal();
+            }
+        });
+
+        // Initialize Google Maps embed inside #map using latitude and longitude
+        document.addEventListener('DOMContentLoaded', function () {
+            var lat = parseFloat('{{ business.latitude|escapejs }}');
+            var lng = parseFloat('{{ business.longitude|escapejs }}');
+
+            var mapContainer = document.getElementById('map');
+            if (!mapContainer || isNaN(lat) || isNaN(lng)) {
+                return;
+            }
+
+            var iframe = document.createElement('iframe');
+            iframe.width = '100%';
+            iframe.height = '250';
+            iframe.style.border = '0';
+            iframe.loading = 'lazy';
+            iframe.referrerPolicy = 'no-referrer-when-downgrade';
+            iframe.src = 'https://www.google.com/maps?q=' + lat + ',' + lng + '&output=embed';
+
+            mapContainer.appendChild(iframe);
+        });
+    </script>
+    {% endif %}
+
+    <script>
+        // Share Modal Logic
+        const shareModal = document.getElementById('shareModal');
+        const shareUrl = "{{ request.build_absolute_uri }}";
+        let qrGenerated = false;
+
+        function openShareModal() {
+            shareModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            if (!qrGenerated) {
+                generateQR();
+                qrGenerated = true;
+            }
+        }
+
+        function closeShareModal() {
+            shareModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close on clicking outside
+        shareModal.addEventListener('click', function (e) {
+            if (e.target === shareModal) {
+                closeShareModal();
+            }
+        });
+
+        // Tabs
+        function switchTab(tab) {
+            document.querySelectorAll('.share-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            if (tab === 'link') {
+                document.querySelectorAll('.share-tab')[0].classList.add('active');
+                document.getElementById('tab-link').classList.add('active');
+            } else {
+                document.querySelectorAll('.share-tab')[1].classList.add('active');
+                document.getElementById('tab-qr').classList.add('active');
+            }
+        }
+
+        // Copy Link
+        function copyShareLink() {
+            const copyText = document.getElementById("shareUrl");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+
+            // Visual feedback
+            const btn = document.querySelector('.copy-btn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+            }, 2000);
+        }
+
+        // Social Share Logic
+        function shareTo(platform) {
+            const url = encodeURIComponent(shareUrl);
+            const text = encodeURIComponent("Check out {{ business.name|escapejs }} on Small Biz Hub!");
+            let link = "";
+
+            switch (platform) {
+                case 'whatsapp':
+                    link = `https://api.whatsapp.com/send?text=${text}%20${url}`;
+                    break;
+                case 'facebook':
+                    link = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                    break;
+                case 'twitter':
+                    link = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+                    break;
+                case 'telegram':
+                    link = `https://t.me/share/url?url=${url}&text=${text}`;
+                    break;
+                case 'linkedin':
+                    link = `https://www.linkedin.com/shareArticle?mini=true&url=${url}`;
+                    break;
+                case 'email':
+                    link = `mailto:?subject=${text}&body=${text} ${url}`;
+                    break;
+                case 'instagram':
+                    alert("Instagram doesn't support direct web sharing. Link copied to clipboard!");
+                    copyShareLink();
+                    link = "https://www.instagram.com/";
+                    break;
+            }
+
+            if (link) {
+                window.open(link, '_blank');
+            }
+        }
+
+        // Native Share (Link)
+        async function nativeShare() {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: '{{ business.name }}',
+                        text: 'Check out {{ business.name }} on Small Biz Hub!',
+                        url: shareUrl
+                    });
+                } catch (err) {
+                    console.log('Error sharing:', err);
+                }
+            } else {
+                alert('Sharing is not supported on this browser/device.');
+            }
+        }
+
+        // Generate Premium QR Card
+        // Generate Premium QR Card
+        function generateQR() {
+            // 1. Generate Raw QR using library
+            const rawContainer = document.getElementById("rawQr");
+            rawContainer.innerHTML = "";
+
+            // Options for EasyQRCodeJS
+            const options = {
+                text: shareUrl,
+                width: 200,
+                height: 200,
+                colorDark: "#10b981", // Brand Primary
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H,
+
+                // Style Customizations
+                dotScale: 0.5, // 0-1, Make it dots!
+                quietZone: 0,
+                backgroundImageAlpha: 1,
+
+                // When done, draw the card
+                onRenderingEnd: function (qrOptions, dataURL) {
+                    // Small delay to ensure canvas is ready
+                    setTimeout(() => {
+                        drawBusinessCard();
+                    }, 50);
+                }
+            };
+
+            new QRCode(rawContainer, options);
+        }
+
+        function drawBusinessCard() {
+            const rawQrImg = document.querySelector("#rawQr img") || document.querySelector("#rawQr canvas");
+            if (!rawQrImg) return;
+
+            // If it's a canvas (some browsers), convert to image first or draw directly
+            let imgSource = rawQrImg;
+
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const container = document.getElementById("qrContainer");
+
+            // Card Dimensions
+            const width = 300;
+            const height = 450;
+            canvas.width = width;
+            canvas.height = height;
+
+            // Background
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, "#ffffff");
+            gradient.addColorStop(1, "#f8fafc");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Top Decoration Bar
+            const gradTop = ctx.createLinearGradient(0, 0, width, 0);
+            gradTop.addColorStop(0, "#10b981");
+            gradTop.addColorStop(1, "#3b82f6");
+            ctx.fillStyle = gradTop;
+            ctx.fillRect(0, 0, width, 12);
+
+            // Business Name
+            ctx.fillStyle = "#1e293b";
+            ctx.font = "bold 24px 'Outfit', sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            // Allow wrapping of long names
+            const businessName = "{{ business.shop|escapejs }}";
+            wrapText(ctx, businessName, width / 2, 70, 260, 30);
+
+            // Subtitle
+            ctx.fillStyle = "#64748b";
+            ctx.font = "14px 'Outfit', sans-serif";
+            ctx.fillText("Scan to visit page", width / 2, 120);
+
+            // Draw QR Code
+            const qrSize = 200;
+            const qrX = (width - qrSize) / 2;
+            const qrY = 150;
+
+            // Shadow for QR
+            ctx.shadowColor = "rgba(0, 0, 0, 0.1)";
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 4;
+
+            // Draw a white box behind QR
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
+
+            // Reset shadow
+            ctx.shadowColor = "transparent";
+
+            // Draw QR
+            ctx.drawImage(imgSource, qrX, qrY, qrSize, qrSize);
+
+            // Bottom Brand
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "italic 12px sans-serif";
+            ctx.fillText("Powered by Small Biz Hub", width / 2, 410);
+
+            // Border
+            ctx.strokeStyle = "#e2e8f0";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(0, 0, width, height);
+
+            // Append to DOM
+            container.innerHTML = "";
+            container.appendChild(canvas);
+        }
+
+        // Helper to wrap text
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            let currentY = y;
+
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+                if (testWidth > maxWidth && n > 0) {
+                    ctx.fillText(line, x, currentY);
+                    line = words[n] + ' ';
+                    currentY += lineHeight;
+                }
+                else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, x, currentY);
+        }
+
+        // Helper to get Canvas from QR
+        function getQRCanvas() {
+            return document.querySelector("#qrContainer canvas");
+        }
+
+        // Download QR
+        function downloadQR() {
+            const canvas = getQRCanvas();
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = '{{ business.name|slugify }}_card.png';
+                link.href = canvas.toDataURL("image/png");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        // Share QR Image
+        async function shareQRImage() {
+            const canvas = getQRCanvas();
+            if (!canvas || !navigator.share) {
+                alert('Sharing not supported on this device.');
+                return;
+            }
+
+            canvas.toBlob(async (blob) => {
+                try {
+                    const file = new File([blob], "business_card.png", { type: "image/png" });
+
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: '{{ business.name }}',
+                            text: 'Visit {{ business.name }} on Small Biz Hub!'
+                        });
+                    } else {
+                        alert('Sharing files is not supported here.');
+                    }
+                } catch (error) {
+                    console.error('Error sharing image:', error);
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

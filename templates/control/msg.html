@@ -1,0 +1,357 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Owner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #23a6d5;
+            --primary-dark: #1c8ab1;
+            --secondary-color: #23d5ab;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #10b981;
+            --chat-bubble-sent: #23a6d5;
+            --chat-bubble-received: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--card-bg);
+            /* Match card bg since it's full screen */
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden;
+            /* Prevent body scroll */
+        }
+
+        .chat-container {
+            width: 100%;
+            height: 100vh;
+            background-color: var(--card-bg);
+            border-radius: 0;
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: none;
+        }
+
+        .chat-header {
+            background: white;
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .header-user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .user-details h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: var(--text-primary);
+        }
+
+        .user-details span {
+            font-size: 12px;
+            color: var(--success-color);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .user-details span::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            background: var(--success-color);
+            border-radius: 50%;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            color: var(--text-primary);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .message-date-divider {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .message-date-divider span {
+            background: #f8fafc;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 12px 18px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            word-wrap: break-word;
+        }
+
+        /* Message from Owner (Left) */
+        .message.received {
+            align-self: flex-start;
+            background-color: var(--chat-bubble-received);
+            color: var(--text-primary);
+            border-radius: 18px 18px 18px 2px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Message from Admin (Right) */
+        .message.sent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-radius: 18px 18px 2px 18px;
+            box-shadow: 0 4px 10px rgba(35, 166, 213, 0.2);
+        }
+
+        .message-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-top: 4px;
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .input-wrapper {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            background: #f8fafc;
+        }
+
+        .chat-input:focus {
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(35, 166, 213, 0.1);
+        }
+
+        .send-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(35, 166, 213, 0.3);
+        }
+
+        .send-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .send-btn svg {
+            margin-left: -2px;
+            /* Visual adjustment for send icon */
+        }
+
+        .empty-chat {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="header-user-info">
+                <div class="user-avatar">
+                    {{ current_owner.email|slice:":1"|upper }}
+                </div>
+                <div class="user-details">
+                    <h2>{{ current_owner.email }}</h2>
+                    <span>Active Now</span>
+                </div>
+            </div>
+            <a href="{% url 'admin_chat_list' %}" class="back-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5"></path>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to List
+            </a>
+        </div>
+
+        <div class="chat-messages" id="messageList">
+            {% if messages %}
+            {% for msg in messages %}
+
+            <div class="message {% if msg.is_from_owner %}received{% else %}sent{% endif %}">
+                {{ msg.content }}
+                <div class="message-meta">
+                    <span class="timestamp" data-timestamp="{{ msg.timestamp|date:'c' }}"></span>
+                    {% if not msg.is_from_owner %}
+                    {% if msg.is_seen %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    {% else %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-chat">
+                <div
+                    style="background: #e0f2fe; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: #0284c7;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <p>No messages yet. Start the conversation!</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <form method="post" class="chat-input-area">
+            {% csrf_token %}
+            <div class="input-wrapper">
+                <input type="text" name="message" class="chat-input" placeholder="Type your message..." required
+                    autocomplete="off">
+            </div>
+            <button type="submit" class="send-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Format timestamps to local device time
+        document.querySelectorAll('.timestamp').forEach(span => {
+            const isoTime = span.getAttribute('data-timestamp');
+            if (isoTime) {
+                const date = new Date(isoTime);
+                // Format: 10:30 AM
+                span.textContent = date.toLocaleString([], { hour: 'numeric', minute: '2-digit' });
+            }
+        });
+
+        // Auto-scroll to bottom
+        const messageList = document.getElementById("messageList");
+        messageList.scrollTop = messageList.scrollHeight;
+    </script>
+
+</body>
+
+</html>
