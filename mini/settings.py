@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -158,13 +159,29 @@ STATICFILES_DIRS = [
 ]
 
 # Media Files Setup
-media_root = os.environ.get('MEDIA_ROOT')
-if media_root:
-    MEDIA_ROOT = media_root
-elif os.environ.get('RENDER') and os.name != 'nt':
-    MEDIA_ROOT = '/var/data/media'
-else:
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+def _resolve_media_root():
+    candidates = []
+
+    explicit_media_root = os.environ.get('MEDIA_ROOT')
+    if explicit_media_root:
+        candidates.append(Path(explicit_media_root))
+
+    if os.environ.get('RENDER') and os.name != 'nt':
+        candidates.append(Path('/var/data/media'))
+
+    candidates.append(BASE_DIR / 'media')
+
+    for candidate in candidates:
+        try:
+            candidate.mkdir(parents=True, exist_ok=True)
+            return str(candidate)
+        except OSError as exc:
+            logging.warning("MEDIA_ROOT candidate %s is not writable: %s", candidate, exc)
+
+    return str(BASE_DIR / 'media')
+
+
+MEDIA_ROOT = _resolve_media_root()
 
 MEDIA_URL = '/media/'
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
