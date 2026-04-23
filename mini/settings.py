@@ -158,7 +158,10 @@ STATICFILES_DIRS = [
 ]
 
 # Media Files Setup
-if os.environ.get('RENDER'):
+media_root = os.environ.get('MEDIA_ROOT')
+if media_root:
+    MEDIA_ROOT = media_root
+elif os.environ.get('RENDER') and os.name != 'nt':
     MEDIA_ROOT = '/var/data/media'
 else:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
